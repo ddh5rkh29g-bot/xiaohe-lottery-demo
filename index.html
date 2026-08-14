@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>抽奖活动管理 Demo</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-block"><span class="brand-mark">奖</span><div><strong>抽奖活动管理</strong><span>课中 / 课外活动统一管理</span></div></div>
+    <nav class="view-tabs" aria-label="原型视图">
+      <button class="view-tab active" data-view="list">活动列表</button>
+      <button class="view-tab" data-view="teacherRecords">中奖记录</button>
+      <button class="view-tab" data-view="detail" id="detailNavTab">编辑抽奖</button>
+      <button class="view-tab" data-view="student">学生端预览</button>
+    </nav>
+    <div class="header-meta"><span class="status-dot"></span>演示数据</div>
+  </header>
+
+  <main>
+    <section id="listView" class="view active admin-view admin-list-page">
+      <section class="admin-list-query">
+        <div class="admin-query-fields">
+          <label><span>抽奖活动</span><input id="activityKeyword" placeholder="请输入抽奖活动ID/名称"></label>
+          <label><span>活动状态</span><select id="activityStatusFilter"><option>进行中</option><option>已结束</option><option>全部</option></select></label>
+          <button class="btn primary compact" id="searchBtn">查询</button>
+          <label class="creator-only"><input type="checkbox"> 只看我创建的</label>
+        </div>
+        <button class="btn primary compact" id="createBtn">＋ 新建抽奖</button>
+      </section>
+
+      <section class="admin-list-result">
+        <div class="table-wrap list-table-wrap">
+          <table class="activity-table admin-activity-table">
+            <thead><tr><th>活动ID</th><th>抽奖活动名称</th><th>抽奖类型</th><th>状态</th><th>开始时间-结束时间</th><th>最近修改时间</th><th>创建人</th><th>最近修改人</th><th>操作</th></tr></thead>
+            <tbody id="activityListBody"></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination"><span id="activityCount">共 10 条</span><select aria-label="每页条数"><option>10条/页</option></select><button disabled>‹</button><button class="active">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>›</button><span>前往</span><input value="1" aria-label="页码"><span>页</span></div>
+      </section>
+    </section>
+
+    <section id="teacherRecordsView" class="view teacher-records-view">
+      <div class="teacher-records-heading"><h1>中奖记录</h1><button class="teacher-copy-link-button" id="copyTeacherLotteryLink" type="button">复制抽奖链接</button></div>
+      <section class="teacher-records-filters" aria-label="中奖记录筛选">
+        <label class="teacher-class-filter"><span>在读小班：</span><select id="teacherClassFilter"><option>3955215947678207</option></select><small>最多展示最近3周内已开课和已结课的15个小班</small></label>
+        <label><span>抽奖类型：</span><select id="teacherLotteryTypeFilter"><option value="all">全部</option><option value="class">课中抽奖</option><option value="post">课外抽奖</option></select></label>
+        <label><span>奖品类型：</span><select id="teacherPrizeTypeFilter"><option value="all">请选择奖品类型</option><option value="皮肤">皮肤</option><option value="勋章">勋章</option><option value="实物">实物</option></select></label>
+        <label><span>课节：</span><select id="teacherLessonFilter"><option value="all">请选择课节</option><option value="读绘本学表达：轻松写出比喻句">读绘本学表达：轻松写出比喻句</option></select></label>
+        <label><span>学生：</span><input id="teacherStudentFilter" placeholder="姓名/手机号/编号"></label>
+        <button class="teacher-export-button" id="exportTeacherRecords" type="button">导出中奖记录</button>
+      </section>
+      <section class="teacher-records-result">
+        <div class="teacher-records-table-wrap">
+          <table class="teacher-records-table">
+            <thead><tr><th>课节</th><th>抽奖类型</th><th>抽奖ID</th><th>抽奖名称</th><th>发起角色</th><th>发起人</th><th>学生姓名</th><th>学生编号</th><th>是否续报</th><th>奖品类型</th><th>奖品名称</th><th>中奖时间</th><th>收货信息</th></tr></thead>
+            <tbody id="teacherRecordsBody"></tbody>
+          </table>
+        </div>
+        <div class="teacher-records-pagination"><select aria-label="每页条数"><option>10条/页</option></select><button disabled>‹</button><button class="active">1</button><button>›</button><span>前往</span><input value="1" aria-label="页码"><span>页</span></div>
+      </section>
+    </section>
+
+    <section id="classDetailView" class="view admin-view class-detail-view">
+      <div class="class-detail-toolbar"><button class="btn secondary" id="backFromClassDetail">返回列表</button></div>
+
+      <section class="class-view-section">
+        <div class="class-view-title"><h2>基本信息</h2></div>
+        <div class="class-info-grid">
+          <div><span><i>*</i> 活动名称：</span><strong id="classDetailName"></strong></div>
+          <div><span><i>*</i> 活动时间：</span><strong id="classDetailTime"></strong></div>
+          <div><span><i>*</i> 可发起抽奖角色：</span><strong>主讲</strong></div>
+          <div><span><i>*</i> 本抽奖可用总次数：</span><strong>2</strong></div>
+          <div><span><i>*</i> 中奖学生范围：</span><strong>从未续报中抽取</strong></div>
+          <div><span>多课节防重复中奖：</span><strong>否</strong><small>未开启，该抽奖活动学生可在不同课节重复中奖</small></div>
+          <div><span><i>*</i>（单课节内）能否重复中奖：</span><strong>不能重复中奖</strong></div>
+          <div><span><i>*</i> 抽奖样式：</span><strong>奖池</strong></div>
+        </div>
+      </section>
+
+      <section class="class-view-section class-readonly-relation">
+        <div class="class-view-title"><h2>抽奖互斥规则</h2><span>互斥规则由课外抽奖活动配置，当前页面仅支持查看</span></div>
+        <div class="table-wrap"><table class="class-relation-table"><thead><tr><th>互斥抽奖</th><th>课外抽奖中奖后，参与课中抽奖</th><th>课中抽奖中奖后，参与课外抽奖</th></tr></thead><tbody id="classRelationBody"></tbody></table></div>
+      </section>
+
+      <section class="class-view-section">
+        <div class="class-view-title"><h2>奖品设置</h2></div>
+        <div class="table-wrap"><table class="class-prize-table"><thead><tr><th>奖品名称</th><th>奖品类型</th><th>图片</th><th>奖品数量</th><th>中奖比例</th><th>虚拟中奖人数</th></tr></thead><tbody id="classPrizeBody"></tbody></table></div>
+        <div class="class-participation-prize"><span>参与奖：</span><strong>积分</strong><b>100</b></div>
+      </section>
+
+      <section class="class-view-section">
+        <div class="class-view-title"><h2>适用课程/班级</h2></div>
+        <div class="sub-tabs"><button type="button" class="active">按课程</button><button type="button">按大班</button><button type="button">小灶课</button></div>
+        <div class="sub-tabs secondary-tabs"><button type="button" class="active">手动输入</button><button type="button">手动选择</button><span>**两种方式只能二选一**</span></div>
+        <pre class="class-id-view">3953636989879295
+3953639342621183</pre>
+      </section>
+    </section>
+
+    <section id="detailView" class="view admin-view edit-view">
+      <div class="page-heading">
+        <div><p class="breadcrumb"><button class="breadcrumb-link" id="backToList">抽奖活动</button> / <span id="detailModeLabel">编辑抽奖</span></p><h1 id="detailTitle"></h1><p class="page-desc" id="detailId"></p></div>
+        <div class="heading-actions"><button class="btn secondary" id="copyCurrentBtn">复制抽奖</button><button class="btn secondary" id="openStudentBtn">预览学生端</button><button class="btn primary" id="saveEditTopBtn">保存</button></div>
+      </div>
+
+      <form id="editActivityForm">
+        <section class="form-section lottery-type-section">
+          <div class="section-title"><h2>抽奖类型</h2></div>
+          <div class="legacy-form lottery-type-form">
+            <div class="legacy-field lottery-type-field">
+              <span><i>*</i> 选择类型：</span>
+              <div class="type-choice-grid" role="radiogroup" aria-label="抽奖类型">
+                <label class="type-choice"><input type="radio" name="editLotteryType" value="class"><span><b>课中抽奖</b><small>课堂内由老师发起，学生在上课期间参与</small></span></label>
+                <label class="type-choice"><input type="radio" name="editLotteryType" value="post"><span><b>课外抽奖</b><small>课堂外通过抽奖链接参与，点击后立即出结果</small></span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="form-section edit-form-section">
+          <div class="section-title"><h2>基本信息</h2></div>
+          <div class="legacy-form">
+            <label class="legacy-field"><span><i>*</i> 活动名称：</span><input id="editActivityName" maxlength="20" placeholder="请输入20个字以内的活动名称"></label>
+            <label class="legacy-field"><span><i>*</i> 活动时间：</span><div class="input-pair"><input type="date" value="2026-08-03"><b>至</b><input type="date" value="2026-08-07"></div></label>
+            <div class="legacy-field class-only-section" data-type-section="class"><span><i>*</i> 可发起抽奖角色：</span><div class="inline-options"><label><input type="checkbox" checked> 主讲</label><label><input type="checkbox"> 辅导</label></div></div>
+            <div class="legacy-field class-only-section" data-type-section="class"><span><i>*</i> 本抽奖可用总次数：</span><div class="number-stepper"><button type="button" aria-label="减少次数">−</button><input type="number" value="1" min="1"><button type="button" aria-label="增加次数">＋</button></div><b class="field-unit">次</b></div>
+            <div class="legacy-field"><span><i>*</i> 中奖学生范围：</span><div class="inline-options"><label><input type="radio" name="winnerRange" checked> 全部学生</label><label><input type="radio" name="winnerRange"> 从已续报中抽取</label><label><input type="radio" name="winnerRange"> 从未续报中抽取</label></div></div>
+            <div class="legacy-field class-only-section" data-type-section="class"><span>多课节防重复中奖：</span><div class="toggle-row"><button class="switch-toggle" type="button" aria-label="多课节防重复中奖" aria-pressed="false"><i></i></button><b>关闭</b><small>未开启，该抽奖活动学生可在不同课节重复中奖</small></div></div>
+            <div class="legacy-field class-only-section align-start" data-type-section="class"><span><i>*</i>（单课节内）能否重复中奖：</span><div class="stack-options"><label><input type="radio" name="lessonDuplicate" checked> 不能重复中奖</label><label><input type="radio" name="lessonDuplicate"> 可以重复中奖，从剩余奖品中随机（适用于多个奖品）</label></div></div>
+            <div class="legacy-field class-only-section" data-type-section="class"><span><i>*</i> 抽奖样式：</span><div class="inline-options"><label><input type="radio" name="lotteryStyle"> 福袋</label><label class="blue-option"><input type="radio" name="lotteryStyle" checked> 奖池</label></div></div>
+            <div class="legacy-field lottery-link-field hidden" id="lotteryLinkRow"><span>抽奖链接：</span><div class="lottery-link-control"><div class="lottery-link-input"><input id="editLotteryLink" type="text" readonly aria-label="抽奖链接"><button class="copy-link-button" type="button" id="copyLotteryLinkBtn">复制链接</button></div><small>活动保存并启用后，学生可通过此链接参与；活动结束或下架后链接自动失效。</small></div></div>
+          </div>
+        </section>
+
+        <section class="form-section relation-section post-only-section" data-type-section="post">
+          <div class="section-title"><div><h2>抽奖互斥规则</h2><span id="relationSectionSubtitle">分别配置课中中奖后参与课外、课外中奖后参与课中的中奖限制</span></div><button class="btn secondary compact" type="button" id="addRelationBtn">＋ 添加互斥抽奖</button></div>
+          <div class="table-wrap"><table class="relation-table"><thead><tr><th>互斥抽奖</th><th>课中抽奖中奖后，参与课外抽奖</th><th>课外抽奖中奖后，参与课中抽奖</th><th id="relationActionHeader">操作</th></tr></thead><tbody id="relationBody"></tbody></table></div>
+          <div class="relation-help"><strong>规则说明</strong><span>“已中奖不可中奖”允许学生正常参与抽奖，但不会再次中奖。</span></div>
+        </section>
+
+        <section class="form-section prize-edit-section">
+          <div class="section-title"><h2>奖品设置</h2><button class="btn primary compact" type="button" id="addPrizeBtn">＋ 添加奖品</button></div>
+          <div class="notice warning prize-inventory-notice post-only-section" data-type-section="post"><b>课外奖品规则</b><span>课外奖品配置中奖概率和发放数量上限；实物奖品可选择不限量，请根据实际库存配置，避免奖品超发。</span></div>
+          <div class="table-wrap"><table class="edit-prize-table"><thead><tr><th>奖品名称</th><th>奖品类型</th><th>图片</th><th id="prizeQuantityHeader">奖品数量</th><th id="prizeProbabilityHeader">中奖比例</th><th id="prizeVirtualHeader">虚拟中奖人数</th><th id="prizeActionHeader">操作</th></tr></thead><tbody id="detailPrizeBody"></tbody></table></div>
+          <div class="participant-row class-only-section" id="participantRow" data-type-section="class"><span>参与奖：</span><select><option>请选择奖品类型</option><option>实物</option><option>虚拟权益</option></select><input placeholder="请输入奖品数量"></div>
+        </section>
+
+        <section class="form-section course-section">
+          <div class="section-title"><h2>适用课程/班级</h2></div>
+          <div class="sub-tabs"><button type="button" class="active">按课程</button><button type="button">按大班</button><button type="button">小灶课</button></div>
+          <div class="sub-tabs secondary-tabs"><button type="button" class="active">手动输入</button><button type="button">手动选择</button><span>两种方式只能二选一</span></div>
+          <textarea class="class-ids" aria-label="课程ID" placeholder="请输入课程ID，每个课程ID一行">3953636989879295
+3953639342621183</textarea>
+        </section>
+
+        <div class="edit-footer"><button class="btn primary" type="submit">保存</button><button class="btn secondary" type="button" id="cancelEditBtn">取消</button></div>
+      </form>
+    </section>
+
+    <section id="studentView" class="view student-workspace">
+      <aside class="prototype-controls">
+        <p class="breadcrumb">学生端演示</p><h1>课外抽奖链接</h1>
+        <div class="control-group"><span>1. 活动与资格</span><div class="segmented student-scenario-control" data-field="activityEligibility"><button class="active" data-value="valid">链接有效·有资格</button><button data-value="not_started">活动未开始</button><button data-value="expired">链接失效</button><button data-value="ineligible">无参与资格</button><button data-value="auth_required">需登录/身份异常</button></div></div>
+        <div class="control-group"><span>2. 课中抽奖记录</span><div class="segmented student-scenario-control" data-field="classLotteryStatus"><button class="active" data-value="not_joined">未参与课中抽奖</button><button data-value="lost">课中参与未中奖</button><button data-value="won_physical_pending">课中实物中奖·待填地址</button><button data-value="won_physical_filled">课中实物中奖·已填地址</button><button data-value="won_virtual">课中虚拟奖中奖</button></div></div>
+        <div class="control-group"><span>3. 本次课外抽奖状态</span><div class="segmented student-scenario-control" data-field="participationStatus"><button class="active" data-value="not_joined">未参与</button><button data-value="participated">已参与</button></div></div>
+        <div class="control-group"><span>4. 开奖结果及领取状态</span><div class="segmented student-scenario-control" data-field="lotteryOutcome" id="lotteryOutcomeControl"><button class="active" data-value="physical_pending">中实物奖</button><button class="hidden" data-value="physical_filled">实物奖·已填地址</button><button data-value="virtual">中虚拟奖</button><button data-value="no_win">未中奖</button></div></div>
+        <div class="control-group"><span>5. 正式课状态</span><div class="segmented student-scenario-control" data-field="formalCourseStatus"><button class="active" data-value="not_enrolled">未报名</button><button data-value="enrolled">已报名·隐藏入口</button><button data-value="unknown">查询异常·隐藏入口</button></div></div>
+        <div class="control-group"><span>6. 售卖链接匹配</span><div class="segmented student-scenario-control" data-field="salesLinkStatus"><button class="active" data-value="single">命中1个班级</button><button data-value="multiple">命中多个·按班级顺序</button><button data-value="none">无有效链接·隐藏入口</button></div><small class="control-note" id="salesLinkSelectionHint">将跳转：数学体验A班报名页</small></div>
+        <button class="btn secondary" id="resetLotteryBtn">重置本次结果</button>
+        <div class="simulation-summary"><span id="summaryRuleLabel">即时中奖率</span><strong id="summaryRuleValue">100%</strong><span>地址截止</span><strong>本期活动结束</strong></div>
+      </aside>
+      <div class="phone-stage"><div class="phone-shell"><div class="phone-screen">
+        <div class="dynamic-island"></div><div class="status-bar"><span>9:41</span><span>5G&nbsp;&nbsp;▰</span></div>
+        <div class="student-page">
+          <header class="student-header"><button class="round-icon">×</button><span id="studentActivityTitle">0803测试</span><button class="student-rules-link" data-open-rules>规则</button></header>
+          <div id="activeLotteryState" class="lottery-state active">
+            <div class="lottery-decorations" aria-hidden="true"><i class="decor-envelope one"></i><i class="decor-envelope two"></i><i class="decor-coin one">¥</i><i class="decor-coin two">¥</i></div>
+            <div class="student-copy"><h2>幸运大奖等你来拿</h2></div>
+            <div class="wheel-area"><div class="wheel-rim"><div class="wheel-lights" id="wheelLights" aria-hidden="true"></div><div class="wheel" id="wheel"><div id="wheelLabels"></div></div><div class="wheel-pointer" aria-hidden="true"></div><button class="spin-button" id="spinButton"><span>幸运</span><small>点击抽奖</small></button></div><div class="wheel-shadow"></div></div>
+            <button class="student-lottery-cta" id="studentLotteryCta">立即参与抽奖</button>
+          </div>
+          <div id="expiredLotteryState" class="lottery-state blocked-state"><div class="blocked-icon expired">期</div><h2>活动已结束</h2><p>本期抽奖链接已经失效</p><span class="expired-note">收货地址入口已同步关闭</span></div>
+          <div id="ineligibleLotteryState" class="lottery-state blocked-state"><div class="blocked-icon">限</div><h2>暂时无法参与</h2><p>你不在本次抽奖活动的适用课程或班级中</p><span class="expired-note">如有疑问，请联系辅导老师</span></div>
+          <div id="notStartedLotteryState" class="lottery-state blocked-state"><div class="blocked-icon">待</div><h2>活动尚未开始</h2><p>请在活动开始后再来参与抽奖</p><span class="expired-note">具体时间以老师通知为准</span></div>
+          <div id="authRequiredLotteryState" class="lottery-state blocked-state"><div class="blocked-icon">登</div><h2>请先登录</h2><p>登录后才能确认你的抽奖资格</p><button class="student-secondary">登录并重试</button></div>
+          <button class="floating-record-entry hidden" id="floatingRecordEntry" type="button"><span>奖</span>中奖记录</button>
+        </div>
+
+        <section class="student-subpage" id="addressPage" aria-label="选择收货地址">
+          <header class="subpage-header"><button class="subpage-back" data-student-back>‹</button><h2>收货地址</h2></header>
+          <p class="address-notice">为保证实物奖品能够顺利邮寄给您，请选择正确的地址</p>
+          <div class="address-list">
+            <button class="address-option" data-address-name="李易峰" data-address-phone="15000000000" data-address-detail="江西省 抚州市 临川区 今天街道办事处"><strong>李易峰&nbsp;&nbsp;15000000000</strong><span>默认</span><p>江西省 抚州市 临川区 今天街道办事处</p><i>›</i></button>
+            <button class="address-option" data-address-name="喝几口" data-address-phone="12345678923" data-address-detail="北京市 北京市 东城区 辜鸿铭套裤"><strong>喝几口&nbsp;&nbsp;12345678923</strong><p>北京市 北京市 东城区 辜鸿铭套裤</p><i>›</i></button>
+          </div>
+          <button class="address-add" id="addAddressBtn">＋ 新建收货地址</button>
+        </section>
+
+        <section class="student-subpage" id="addressFormPage" aria-label="新建收货地址">
+          <header class="subpage-header"><button class="subpage-back" id="backToAddressList">‹</button><h2>新建收货地址</h2></header>
+          <form class="address-form" id="studentAddressForm">
+            <label><span>收货人</span><input id="recipientName" required placeholder="请输入收货人姓名"></label>
+            <label><span>手机号</span><input id="recipientPhone" required inputmode="numeric" placeholder="请输入手机号"></label>
+            <label><span>所在地区</span><input id="recipientRegion" required placeholder="省 / 市 / 区"></label>
+            <label><span>详细地址</span><textarea id="recipientDetail" required placeholder="街道、门牌号等详细信息"></textarea></label>
+            <button type="submit">保存并使用</button>
+          </form>
+        </section>
+
+        <section class="student-subpage record-page" id="winningRecordsPage" aria-label="中奖信息">
+          <header class="subpage-header"><button class="subpage-back" data-student-back>‹</button><h2>中奖信息</h2></header>
+          <div class="winning-record-list">
+            <article class="winning-record-card physical-record" id="primaryWinningRecord"><img id="primaryRecordImage" src="assets/prize-projector.png" alt="投影仪"><div class="record-main"><div class="record-title"><h3 id="primaryRecordTitle">投影仪</h3><span class="lottery-source-tag post" id="primaryRecordSource">课外抽奖</span></div><p id="primaryRecordDescription">实物奖品请在活动结束前填写收货地址</p><time>2026.08.05 18:30:15</time><div class="record-address" id="recordAddress"><strong><span id="recordAddressName">李易峰</span><span id="recordAddressPhone">15000000000</span></strong><p id="recordAddressDetail">江西省 抚州市 临川区 今天街道办事处</p></div></div><button class="record-address-action" id="recordAddressAction">选择收货地址</button><button class="record-arrow hidden" id="editRecordAddress">›</button></article>
+            <article class="winning-record-card"><img src="assets/prize-robot.png" alt="专注之星勋章"><div class="record-main"><div class="record-title"><h3>专注之星勋章</h3><span class="lottery-source-tag class">课中抽奖</span></div><p>请在“小盒课堂-我的-勋章”查看</p><time>2026.08.03 19:42:06</time></div><button class="record-action">去查看</button></article>
+            <article class="winning-record-card"><img src="assets/prize-camera.png" alt="限定课堂皮肤"><div class="record-main"><div class="record-title"><h3>限定课堂皮肤</h3><span class="lottery-source-tag post">课外抽奖</span></div><p>请在“小盒课堂-我的-小象助学官”查看/换装</p><time>2026.07.28 20:08:31</time></div><button class="record-action">去查看</button></article>
+            <article class="winning-record-card"><img src="assets/prize-projector.png" alt="课堂投影仪"><div class="record-main"><div class="record-title"><h3>课堂投影仪</h3><span class="lottery-source-tag class">课中抽奖</span></div><p>实物奖品请联系辅导老师领取</p><time>2026.07.21 19:16:42</time></div></article>
+          </div>
+        </section>
+
+        <section class="student-subpage signup-page" id="courseSignupPage" aria-label="正式课程报名">
+          <header class="subpage-header"><button class="subpage-back" data-student-back>‹</button><h2>正式课程报名</h2></header>
+          <div class="signup-hero"><span>已为你匹配</span><h2 id="courseSignupClass">数学体验A班</h2><p>跟着老师继续学习，系统化巩固课堂知识</p></div>
+          <div class="signup-offer"><small>正式课程</small><strong>5节进阶课程</strong><p>报名后由辅导老师联系确认课程安排</p><div><b>¥99</b><span>限时体验价</span></div></div>
+          <div class="signup-target"><span>当前报名页面</span><code id="courseSignupUrl">https://h5.xiaohe.com/course/signup?class_id=3953636989879295</code></div>
+          <button class="signup-submit" id="courseSignupSubmit" type="button">立即报名</button>
+        </section>
+
+        <section class="student-subpage rules-page" id="lotteryRulesPage" aria-label="抽奖规则">
+          <header class="subpage-header"><button class="subpage-back" id="backFromRules">‹</button><h2>抽奖规则</h2><span></span></header>
+          <div class="rules-content">
+            <section><h3>参与说明</h3><p>活动面向适用课程或班级的学生开放，抽奖结果以页面最终展示为准。</p></section>
+            <section><h3>中奖限制</h3><p>如已在关联的课中抽奖中中奖，仍可参与本次课外抽奖，但不会重复中奖。</p></section>
+            <section><h3>奖品领取</h3><p>实物奖品需在活动结束前填写收货地址；虚拟权益沿用现有奖品发放方式。</p></section>
+            <section><h3>有效期限</h3><p>招生活动结束后，抽奖链接及实物奖品收货地址入口同步失效。</p></section>
+          </div>
+        </section>
+
+        <div class="modal-backdrop student-modal-backdrop" id="resultModal" aria-hidden="true"><div class="student-result" id="studentResult"><button class="result-close" data-close="resultModal">×</button><div class="result-gift" aria-hidden="true"><i></i></div><div class="result-badge" id="resultBadge">中奖啦</div><h2 class="result-heading">我的奖品</h2><div class="result-image"><img id="resultImage" src="assets/prize-projector.png" alt="投影仪"><img id="noWinImage" src="assets/no-win-placeholder.png" alt="未中奖"></div><h3 id="resultTitle">投影仪</h3><p id="resultDescription">请在活动结束前填写收货地址</p><button class="student-primary" id="addressBtn">填写收货地址</button><button class="student-secondary hidden" id="recordBtn">查看中奖记录</button><button class="student-secondary" id="courseBtn">跟着老师继续学</button><small id="resultDeadline">逾期未填写，奖品将自动失效</small></div></div>
+
+        <div class="modal-backdrop student-modal-backdrop" id="usedChanceModal" aria-hidden="true"><div class="used-chance-card"><button class="used-chance-close" data-close="usedChanceModal">×</button><div class="chance-wheel" aria-hidden="true"><i></i></div><h2>您的抽奖机会已用完哦~</h2><p>无法再参与本次抽奖活动了哦~</p><button class="used-chance-action" id="usedChanceAction">查看中奖记录</button></div></div>
+        <div class="home-indicator"></div>
+      </div></div></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="relationModal" aria-hidden="true">
+    <div class="modal"><div class="modal-header"><h2>添加互斥抽奖</h2><button class="close-modal" data-close="relationModal">×</button></div><form id="relationForm" class="copy-form"><div class="field"><span>互斥抽奖</span><div class="activity-picker"><input id="relationActivitySearch" autocomplete="off" placeholder="输入抽奖名称或活动ID查询" aria-label="查询互斥抽奖" aria-controls="relationActivityResults"><input type="hidden" id="relationActivity"><div id="relationActivityResults" class="activity-picker-results" role="listbox"></div></div></div><label class="field relation-rule-field"><span>课中抽奖中奖后，参与课外抽奖</span><select id="relationIntoCurrent"><option value="none">不限制</option><option value="no_win">已中奖不可中奖</option></select></label><label class="field relation-rule-field"><span>课外抽奖中奖后，参与课中抽奖</span><select id="relationIntoOther"><option value="none">不限制</option><option value="no_win">已中奖不可中奖</option></select></label><div class="modal-actions"><button type="button" class="btn secondary" data-close="relationModal">取消</button><button class="btn primary" type="submit">保存规则</button></div></form></div>
+  </div>
+
+  <div class="modal-backdrop" id="teacherLotteryLinkModal" aria-hidden="true">
+    <div class="modal lottery-link-picker-modal" role="dialog" aria-modal="true" aria-labelledby="teacherLotteryLinkTitle">
+      <div class="modal-header"><div><h2 id="teacherLotteryLinkTitle">选择课外抽奖活动</h2><small class="modal-header-subtitle">当前小班匹配到多个可用活动，请选择后复制链接</small></div><button class="close-modal" data-close="teacherLotteryLinkModal" aria-label="关闭">×</button></div>
+      <div class="lottery-link-picker-body">
+        <div class="lottery-link-picker-tip"><strong>选择后即可复制</strong><span>活动规则由运营配置，辅导仅负责分发链接</span></div>
+        <div id="teacherLotteryLinkOptions" class="lottery-link-options" role="radiogroup" aria-label="可用课外抽奖活动"></div>
+      </div>
+      <div class="modal-actions lottery-link-picker-actions"><button type="button" class="btn secondary" data-close="teacherLotteryLinkModal">取消</button><button class="btn primary" type="button" id="confirmTeacherLotteryLink">复制选中链接</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="prizeModal" aria-hidden="true">
+    <div class="modal prize-editor-modal"><div class="modal-header"><h2>添加奖品</h2><button class="close-modal" data-close="prizeModal">×</button></div>
+      <form id="prizeForm" class="prize-editor-form">
+        <label><span><i>*</i> 奖品名称：</span><input id="newPrizeName" required></label>
+        <label><span><i>*</i> 奖品类型：</span><select id="newPrizeType"><option>实物</option><option>优惠券</option><option>学贝</option><option>皮肤</option><option>勋章</option></select></label>
+        <div class="prize-image-field"><span>奖品图片：</span><div class="upload-preview"><img id="newPrizePreview" src="assets/prize-projector.png" alt="奖品预览"><b>✓</b></div><small>支持格式：jpg、png<br>宽高比例：1:1<br>单个文件不能超过5MB</small></div>
+        <label class="align-start"><span><i>*</i> 奖品说明：</span><div><textarea id="newPrizeDesc">实物奖品请联系辅导老师领取</textarea><small>奖品说明会显示在学生侧</small></div></label>
+        <div class="prize-rule-field class-prize-rule"><span><i>*</i> 奖品数量：</span><div><div class="inline-options"><label><input type="radio" name="prizeMode" value="fixed"> 奖品数量固定</label><label class="blue-option"><input type="radio" name="prizeMode" value="ratio" checked> 数量不固定，按比例（在线人数或参与人数）</label></div><div class="unit-input"><input id="newPrizeValue" type="number" value="30" min="1"><span id="newPrizeUnit">%</span></div></div></div>
+        <div class="prize-rule-field class-prize-rule"><span><i>*</i> 虚拟中奖人数：</span><label class="inline-options"><input type="radio" checked> 否</label></div>
+        <div id="postPrizeRules" class="post-prize-rules hidden">
+          <div class="prize-rule-field"><span><i>*</i> 中奖概率：</span><div><div class="unit-input"><input id="newPrizeProbability" type="number" value="10" min="0" max="100" step="0.1"><span>%</span></div><small>每位符合中奖范围的学生，按该概率随机获得奖品</small></div></div>
+          <div class="prize-rule-field"><span>发放数量上限：</span><div><div class="inventory-option"><label class="inline-options"><input id="newPrizeUnlimited" type="checkbox"> 不限量</label><div class="unit-input inventory-cap-input"><input id="newPrizeCap" type="number" min="1" placeholder="请输入最多发放份数"><span>份</span></div></div><small>实物奖品建议设置上限，虚拟权益可选择不限量</small></div></div>
+        </div>
+        <div class="modal-actions"><button class="btn primary" type="submit">保存</button><button class="btn secondary" type="button" data-close="prizeModal">取消</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

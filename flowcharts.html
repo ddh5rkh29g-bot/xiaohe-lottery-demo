@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课外抽奖核心用户动线</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;background:#fff;color:#1f2937;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+    body{overflow:hidden}
+    svg{display:block;background:#fff}
+    .chart-title{font-size:38px;font-weight:700;fill:#1f2937;letter-spacing:0}
+    .chart-subtitle{font-size:18px;fill:#667085;letter-spacing:0}
+    .section-label{font-size:15px;font-weight:700;fill:#2f6feb;letter-spacing:1px}
+    .node rect{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:8}
+    .node.primary rect{fill:#eef5ff;stroke:#74a3ed}
+    .node.success rect{fill:#edf8f2;stroke:#63a982}
+    .node.warning rect{fill:#fff7e8;stroke:#d8a04e}
+    .node.muted rect{fill:#f7f8fa;stroke:#d5dae1}
+    .node-title{font-size:22px;font-weight:700;fill:#253247;letter-spacing:0}
+    .node-sub{font-size:17px;fill:#667085;letter-spacing:0}
+    .step-index{font-size:14px;font-weight:700;fill:#2f6feb;letter-spacing:0}
+    .decision polygon{fill:#fff7e8;stroke:#d8a04e;stroke-width:2}
+    .decision-title{font-size:20px;font-weight:700;fill:#3b4658;letter-spacing:0}
+    .decision-sub{font-size:16px;fill:#7a6542;letter-spacing:0}
+    .edge{fill:none;stroke:#8d99aa;stroke-width:3;marker-end:url(#arrow)}
+    .edge.dashed{stroke-dasharray:9 8}
+    .edge-label{font-size:16px;font-weight:700;fill:#5d6a7c;letter-spacing:0}
+    .edge-label.yes{fill:#18794e}
+    .edge-label.no{fill:#b26b18}
+    .rule-note{font-size:16px;fill:#667085;letter-spacing:0}
+    .divider{stroke:#e5e9ef;stroke-width:2}
+  </style>
+</head>
+<body>
+  <svg id="flowchart" role="img" aria-labelledby="chartTitle chartDesc"></svg>
+  <script>
+    const flow = new URLSearchParams(location.search).get('flow') || 'operation';
+    const svg = document.getElementById('flowchart');
+    const sizes = {
+      operation:[1600,900],
+      distribution:[1600,820],
+      student:[1600,1120],
+      records:[1600,760]
+    };
+    const [width,height] = sizes[flow] || sizes.operation;
+    document.body.style.width = width + 'px';
+    document.body.style.height = height + 'px';
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+    const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const defs = `<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#8d99aa"/></marker></defs>`;
+    const header = (title,subtitle) => `<title id="chartTitle">${esc(title)}</title><desc id="chartDesc">${esc(subtitle)}</desc><text class="section-label" x="70" y="54">CORE USER FLOW</text><text class="chart-title" x="70" y="105">${esc(title)}</text><text class="chart-subtitle" x="70" y="140">${esc(subtitle)}</text><line class="divider" x1="70" y1="166" x2="1530" y2="166"/>`;
+    const node = ({x,y,w=260,h=118,title,subs=[],tone='',step=''}) => {
+      const subText = subs.map((line,index)=>`<tspan x="${x+22}" dy="${index===0?30:25}">${esc(line)}</tspan>`).join('');
+      return `<g class="node ${tone}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><text class="step-index" x="${x+22}" y="${y+25}">${esc(step)}</text><text class="node-title" x="${x+22}" y="${y+58}">${esc(title)}</text><text class="node-sub" x="${x+22}" y="${y+58}">${subText}</text></g>`;
+    };
+    const decision = ({cx,cy,w=200,h=126,title,sub=''}) => {
+      const pts = `${cx},${cy-h/2} ${cx+w/2},${cy} ${cx},${cy+h/2} ${cx-w/2},${cy}`;
+      return `<g class="decision"><polygon points="${pts}"/><text class="decision-title" text-anchor="middle" x="${cx}" y="${cy-3}">${esc(title)}</text>${sub?`<text class="decision-sub" text-anchor="middle" x="${cx}" y="${cy+25}">${esc(sub)}</text>`:''}</g>`;
+    };
+    const edge = (points,label='',labelX=null,labelY=null,kind='',dashed=false) => {
+      const d = points.map((p,index)=>`${index===0?'M':'L'} ${p[0]} ${p[1]}`).join(' ');
+      return `<path class="edge${dashed?' dashed':''}" d="${d}"/>${label?`<text class="edge-label ${kind}" x="${labelX}" y="${labelY}">${esc(label)}</text>`:''}`;
+    };
+    const note = (x,y,text) => `<text class="rule-note" x="${x}" y="${y}">${esc(text)}</text>`;
+
+    function operation(){
+      const edges = [
+        edge([[330,260],[425,260]]), edge([[705,260],[790,260]]), edge([[1070,260],[1150,260]]),
+        edge([[1290,320],[1290,425]]), edge([[1150,485],[1080,485]]), edge([[800,485],[715,485]]),
+        edge([[475,485],[350,485]] ,'通过',385,468,'yes'),
+        edge([[595,548],[595,650]],'不通过',615,610,'no'),
+        edge([[595,742],[920,742],[920,550]],'修改后重新校验',690,726,'',true)
+      ].join('');
+      const nodes = [
+        node({x:70,y:200,w:260,title:'活动列表',subs:['复制课中抽奖','或新建课外抽奖'],tone:'primary',step:'01'}),
+        node({x:425,y:200,w:280,title:'生成独立活动',subs:['生成新 activity_id','奖品素材复制为快照'],step:'02'}),
+        node({x:790,y:200,w:280,title:'配置适用范围',subs:['关联课程或大班','两类关系按 OR 匹配'],step:'03'}),
+        node({x:1150,y:200,w:280,title:'配置中奖规则',subs:['中奖学生范围','独立奖品与即时比例'],step:'04'}),
+        node({x:1150,y:425,w:280,title:'配置互斥关系',subs:['候选仅课中抽奖','两个方向分别设置'],step:'05'}),
+        node({x:800,y:425,w:280,title:'完成保存校验',subs:['范围、比例、互斥','必填项与权限'],step:'06'}),
+        decision({cx:595,cy:485,w:240,h:126,title:'校验通过？'}),
+        node({x:70,y:425,w:280,title:'保存并启用',subs:['生成长期复用链接','供小班管理复制'],tone:'success',step:'07'}),
+        node({x:455,y:650,w:280,h:92,title:'定位错误字段',subs:['保留已填写内容'],tone:'warning',step:'修正'})
+      ].join('');
+      return header('运营配置课外抽奖','课中配置保持不变；课外活动独立配置并生成长期复用链接') + edges + nodes + note(70,840,'关键规则：课程 / 大班任一命中即可；课外奖品与课中奖池完全独立。');
+    }
+
+    function distribution(){
+      const edges = [
+        edge([[340,285],[430,285]]), edge([[730,285],[820,285]]), edge([[1120,285],[1190,285]]),
+        edge([[1300,360],[1300,450],[350,450],[350,520]],'0 个',760,436,'no'),
+        edge([[1300,360],[1300,450],[800,450],[800,520]],'1 个',1030,436,'yes'),
+        edge([[1300,360],[1300,520]],'多个',1320,440,''),
+        edge([[1300,638],[1300,650]])
+      ].join('');
+      const nodes = [
+        node({x:70,y:225,w:270,title:'小班管理',subs:['点击“复制课外抽奖链接”'],tone:'primary',step:'01'}),
+        node({x:430,y:225,w:300,title:'读取班级关系',subs:['当前小班 → 所属大班','所属大班 → 所属课程'],step:'02'}),
+        node({x:820,y:225,w:300,title:'匹配课外活动',subs:['适用大班命中 OR','适用课程命中'],step:'03'}),
+        decision({cx:1300,cy:285,w:220,h:150,title:'可用活动数？',sub:'去重后'}),
+        node({x:210,y:520,w:280,title:'暂无可用活动',subs:['按钮置灰或提示','当前小班暂无活动'],tone:'muted',step:'0 个'}),
+        node({x:660,y:520,w:280,title:'直接复制链接',subs:['提示“抽奖链接已复制”'],tone:'success',step:'1 个'}),
+        node({x:1160,y:520,w:280,title:'选择活动',subs:['展示名称、ID、有效期','辅导明确选择，不随机'],tone:'warning',step:'多个'}),
+        node({x:1030,y:650,w:300,h:92,title:'复制所选活动链接',subs:['记录小班、活动、操作人'],tone:'success',step:'完成'})
+      ].join('');
+      return header('辅导老师复制链接','入口只负责分发，不允许修改活动范围、奖品、比例或互斥规则') + edges + nodes + note(70,780,'学生最终资格仍以登录身份和当前小班关系实时校验；小班 ID 仅用于渠道归因。');
+    }
+
+    function student(){
+      const edges = [
+        edge([[300,245],[355,245]]), edge([[525,245],[595,245]],'是',545,228,'yes'),
+        edge([[765,245],[835,245]],'是',782,228,'yes'), edge([[1005,245],[1075,245]],'是',1020,228,'yes'),
+        edge([[1245,245],[1315,245]],'是',1260,228,'yes'),
+        edge([[440,310],[440,370]],'否',455,350,'no'), edge([[680,310],[680,370]],'否',695,350,'no'),
+        edge([[920,310],[920,370]],'否',935,350,'no'), edge([[1435,300],[1400,370]],'展示',1445,345,''),
+        edge([[1160,310],[1160,505],[1400,505],[1400,545]],'否',1175,490,'no'),
+        edge([[1280,605],[1160,605]],'是',1195,588,'yes'),
+        edge([[1400,665],[1400,710],[720,710],[720,665]],'否',1050,695,'no'),
+        edge([[840,605],[900,605]],'否',852,588,'no'), edge([[600,605],[530,605]],'是',552,588,'yes'),
+        edge([[400,663],[400,720],[205,720],[205,755]],'生成结果',220,705,'yes'),
+        edge([[1030,663],[1030,790],[1280,790],[1280,920]],'固定未中奖',1060,775,'no'),
+        edge([[205,875],[205,890],[600,890],[600,920]],'实物',385,880,''),
+        edge([[205,875],[205,890],[940,890],[940,920]],'虚拟权益',725,880,''),
+        edge([[205,875],[205,890],[1280,890],[1280,920]],'未中奖',1085,880,'')
+      ].join('');
+      const nodes = [
+        node({x:50,y:190,w:250,h:110,title:'打开课外链接',subs:['识别 activity_id 与学生'],tone:'primary',step:'01'}),
+        decision({cx:440,cy:245,w:170,h:130,title:'活动有效？'}),
+        decision({cx:680,cy:245,w:170,h:130,title:'命中范围？',sub:'课程 / 大班'}),
+        decision({cx:920,cy:245,w:170,h:130,title:'在参与窗口？',sub:'结课 + 2天'}),
+        decision({cx:1160,cy:245,w:170,h:130,title:'已参与？'}),
+        node({x:1315,y:190,w:240,h:110,title:'返回首次结果',subs:['不重新随机'],tone:'muted',step:'幂等'}),
+        node({x:300,y:370,w:280,h:92,title:'活动不可用',subs:['未开始 / 已结束'],tone:'muted',step:'结束'}),
+        node({x:590,y:370,w:280,h:92,title:'无参与资格',subs:['不自动跳转其他活动'],tone:'muted',step:'结束'}),
+        node({x:880,y:370,w:280,h:92,title:'参与尚未开始或已截止',subs:['展示准确时间状态'],tone:'muted',step:'结束'}),
+        node({x:1260,y:370,w:280,h:118,title:'展示已参与状态',subs:['实物待填显示地址入口','其他结果进入中奖记录'],tone:'muted',step:'结束'}),
+        decision({cx:1400,cy:605,w:240,h:120,title:'命中课中中奖限制？'}),
+        node({x:900,y:545,w:260,title:'固定未中奖',subs:['允许点击','不进入随机算法'],tone:'warning',step:'互斥'}),
+        decision({cx:720,cy:605,w:240,h:120,title:'进入中奖学生范围？'}),
+        node({x:270,y:545,w:260,title:'即时随机开奖',subs:['按课外奖品比例','单次最多一个奖品'],tone:'primary',step:'开奖'}),
+        decision({cx:205,cy:815,w:220,h:120,title:'结果类型？'}),
+        node({x:460,y:920,w:280,title:'实物奖品',subs:['截止前填写收货地址'],tone:'success',step:'结果'}),
+        node({x:800,y:920,w:280,title:'虚拟权益',subs:['沿用现有发放能力'],tone:'success',step:'结果'}),
+        node({x:1140,y:920,w:280,title:'未中奖',subs:['中奖记录 / 正式课入口'],tone:'muted',step:'结果'})
+      ].join('');
+      return header('学生抽奖与领奖','页面加载与点击开奖时均实时校验；同一活动每个学生只产生一次结果') + edges + nodes + note(70,1080,'截止时间：单班 = 最后一节课结束时间 + 48h；多班取当前有效窗口最晚值，再与活动结束时间取较早值。');
+    }
+
+    function records(){
+      const edges = [
+        edge([[340,285],[430,285]]), edge([[730,285],[820,285]]), edge([[1120,285],[1180,285]]),
+        edge([[1320,345],[1320,450],[1010,450],[1010,515]],'查看',1100,435,'yes'),
+        edge([[1320,345],[1320,450],[1370,450],[1370,515]],'导出',1365,435,'')
+      ].join('');
+      const nodes = [
+        node({x:70,y:225,w:270,title:'进入中奖记录',subs:['辅导老师所带班级'],tone:'primary',step:'01'}),
+        node({x:430,y:225,w:300,title:'选择在读小班',subs:['沿用现有权限范围'],step:'02'}),
+        node({x:820,y:225,w:300,title:'设置筛选条件',subs:['抽奖类型 / 奖品类型','课节 / 学生信息'],step:'03'}),
+        node({x:1180,y:225,w:280,title:'课中 / 课外混合列表',subs:['课外记录课节为空'],step:'04'}),
+        node({x:850,y:515,w:320,title:'查看奖品与收货信息',subs:['手机号、地址按权限脱敏'],tone:'success',step:'查看'}),
+        node({x:1210,y:515,w:320,title:'导出当前筛选结果',subs:['记录操作人和导出时间'],tone:'muted',step:'导出'})
+      ].join('');
+      return header('辅导老师查看中奖记录','同一页面查看课中、课外记录，并通过抽奖类型筛选明确区分') + edges + nodes + note(70,715,'列表新增“抽奖类型”列；课外没有课节概念，课节单元格保持空白。');
+    }
+
+    const renderers = {operation,distribution,student,records};
+    svg.innerHTML = defs + (renderers[flow] || operation)();
+  </script>
+</body>
+</html>

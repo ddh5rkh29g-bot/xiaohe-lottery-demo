@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课外抽奖功能全景图</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;width:1600px;height:1160px;overflow:hidden;background:#fff;color:#243044;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+    svg{display:block;width:1600px;height:1160px;background:#fff}
+    .eyebrow{font-size:15px;font-weight:700;fill:#2f6feb;letter-spacing:1px}
+    .title{font-size:38px;font-weight:700;fill:#1f2937;letter-spacing:0}
+    .subtitle{font-size:18px;fill:#667085;letter-spacing:0}
+    .root-title{font-size:25px;font-weight:700;fill:#244b8f;letter-spacing:0}
+    .root-sub{font-size:17px;fill:#58719b;letter-spacing:0}
+    .lane-title{font-size:22px;font-weight:700;letter-spacing:0}
+    .lane-tag{font-size:14px;font-weight:700;letter-spacing:0}
+    .item-title{font-size:18px;font-weight:700;fill:#2b374a;letter-spacing:0}
+    .item-sub{font-size:15px;fill:#6b778a;letter-spacing:0}
+    .branch{fill:none;stroke:#a4afbf;stroke-width:2}
+    .boundary-title{font-size:17px;font-weight:700;fill:#8a5a18;letter-spacing:0}
+    .boundary-item{font-size:15px;fill:#755e3d;letter-spacing:0}
+  </style>
+</head>
+<body>
+  <svg id="featureMap" role="img" aria-labelledby="mapTitle mapDesc"></svg>
+  <script>
+    const svg = document.getElementById('featureMap');
+    const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const lanes = [
+      {
+        x:70,
+        title:'课中抽奖',
+        tag:'保持不变',
+        color:'#64748b',
+        soft:'#f4f6f8',
+        items:[
+          ['创建与编辑','原字段、流程和权限不变'],
+          ['奖品策略','固定数量 / 在线人数比例'],
+          ['课中发起','沿用现有参与与开奖方式'],
+          ['互斥规则展示','查看页只读，不提供维护入口']
+        ]
+      },
+      {
+        x:365,
+        title:'运营后台',
+        tag:'新增 / 改造',
+        color:'#2f6feb',
+        soft:'#eef5ff',
+        items:[
+          ['活动列表','新增“抽奖类型”字段'],
+          ['创建 / 复制 / 编辑','独立 ID，复制后进入编辑页'],
+          ['适用范围','课程 / 大班可多选，OR 匹配'],
+          ['中奖学生范围','全部 / 已续报 / 未续报'],
+          ['独立奖品','奖品快照 + 即时中奖比例'],
+          ['互斥抽奖','仅从课外侧关联课中活动'],
+          ['抽奖链接','查看页展示长期复用链接']
+        ]
+      },
+      {
+        x:660,
+        title:'学生端',
+        tag:'新增主链路',
+        color:'#cf7524',
+        soft:'#fff6e9',
+        items:[
+          ['参与资格','身份 + 范围 + 小班时间'],
+          ['即时开奖','大转盘，点击即出结果'],
+          ['中奖判定','互斥 → 中奖范围 → 比例'],
+          ['结果幂等','同一活动每人只产生一次'],
+          ['实物领奖','填写收货地址，逾期失效'],
+          ['虚拟权益','沿用现有发放能力'],
+          ['正式课入口','未报名 + 班级有售卖链接'],
+          ['规则与记录','主页规则 / 中奖记录入口']
+        ]
+      },
+      {
+        x:955,
+        title:'辅导老师',
+        tag:'分发与查询',
+        color:'#2f8f63',
+        soft:'#eef8f3',
+        items:[
+          ['小班复制链接','按小班所属大班 / 课程匹配'],
+          ['活动数量状态','0 个提示 / 1 个直接 / 多个选择'],
+          ['权限限制','只复制链接，不修改活动'],
+          ['中奖记录筛选','全部 / 课中抽奖 / 课外抽奖'],
+          ['列表与导出','新增类型列，课外课节为空']
+        ]
+      },
+      {
+        x:1250,
+        title:'系统支撑',
+        tag:'共享规则',
+        color:'#58708f',
+        soft:'#f1f5f9',
+        items:[
+          ['班级关系解析','学生 → 小班 → 大班 → 课程'],
+          ['学生截止时间','最后一节课结束 + 48h'],
+          ['多班级决策','截止取较晚，售卖取早开班'],
+          ['双向中奖限制','课外配置，课中开奖时反查'],
+          ['幂等与原子性','activity_id + student_id'],
+          ['权限与审计','配置、复制、导出全链路日志'],
+          ['数据与隐私','转化指标、地址脱敏与保留']
+        ]
+      }
+    ];
+
+    const laneWidth = 275;
+    const laneTop = 325;
+    const laneHeaderHeight = 72;
+    const laneBodyHeight = 610;
+    const rootX = 70;
+    const rootY = 185;
+    const rootWidth = 1455;
+    const rootHeight = 86;
+
+    function itemRows(lane){
+      const rowHeight = laneBodyHeight / lane.items.length;
+      return lane.items.map((item,index)=>{
+        const y = laneTop + laneHeaderHeight + index * rowHeight;
+        const subLines = item[1].split(' / ');
+        const sub = subLines.map((line,lineIndex)=>`<tspan x="${lane.x+18}" dy="${lineIndex===0?23:20}">${esc(lineIndex===0?line:`/ ${line}`)}</tspan>`).join('');
+        return `<g><line x1="${lane.x}" y1="${y}" x2="${lane.x+laneWidth}" y2="${y}" stroke="#e4e9ef"/><text class="item-title" x="${lane.x+18}" y="${y+27}">${esc(item[0])}</text><text class="item-sub" x="${lane.x+18}" y="${y+27}">${sub}</text></g>`;
+      }).join('');
+    }
+
+    function laneMarkup(lane){
+      return `<g><rect x="${lane.x}" y="${laneTop}" width="${laneWidth}" height="${laneHeaderHeight+laneBodyHeight}" rx="8" fill="#fff" stroke="#d8dee8" stroke-width="2"/><path d="M ${lane.x+8} ${laneTop} H ${lane.x+laneWidth-8} Q ${lane.x+laneWidth} ${laneTop} ${lane.x+laneWidth} ${laneTop+8} V ${laneTop+laneHeaderHeight} H ${lane.x} V ${laneTop+8} Q ${lane.x} ${laneTop} ${lane.x+8} ${laneTop}" fill="${lane.soft}"/><rect x="${lane.x}" y="${laneTop}" width="6" height="${laneHeaderHeight}" rx="3" fill="${lane.color}"/><text class="lane-title" x="${lane.x+20}" y="${laneTop+31}" fill="${lane.color}">${esc(lane.title)}</text><text class="lane-tag" x="${lane.x+20}" y="${laneTop+55}" fill="${lane.color}">${esc(lane.tag)}</text>${itemRows(lane)}</g>`;
+    }
+
+    const centers = lanes.map(lane=>lane.x+laneWidth/2);
+    const branches = centers.map(center=>`<path class="branch" d="M 797.5 271 V 296 H ${center} V 325"/>`).join('');
+    const boundaryItems = ['不接入真实库存锁定','不单独建设换班迁移','课中侧不维护互斥','不禁止参与，只限制再中奖'];
+    const boundary = boundaryItems.map((item,index)=>`<text class="boundary-item" x="${285+index*315}" y="1087"><tspan fill="#c17820">•</tspan><tspan dx="7">${esc(item)}</tspan></text>`).join('');
+
+    svg.innerHTML = `
+      <title id="mapTitle">课外抽奖功能全景图</title>
+      <desc id="mapDesc">展示课中抽奖、运营后台、学生端、辅导老师和系统支撑五个功能分区及本期边界。</desc>
+      <text class="eyebrow" x="70" y="48">MVP FUNCTION MAP</text>
+      <text class="title" x="70" y="99">课外抽奖功能全景</text>
+      <text class="subtitle" x="70" y="136">按角色和系统责任分区，明确保持不变、新增改造与共享规则</text>
+      <line x1="70" y1="162" x2="1525" y2="162" stroke="#e2e7ee" stroke-width="2"/>
+      <rect x="${rootX}" y="${rootY}" width="${rootWidth}" height="${rootHeight}" rx="8" fill="#eef5ff" stroke="#75a2e8" stroke-width="2"/>
+      <text class="root-title" x="${rootX+26}" y="${rootY+37}">抽奖功能 V4.1 · MVP</text>
+      <text class="root-sub" x="${rootX+26}" y="${rootY+65}">课外活动独立配置，通过课程 / 大班长期复用；课中与课外只在中奖资格上互斥</text>
+      ${branches}
+      ${lanes.map(laneMarkup).join('')}
+      <rect x="70" y="1030" width="1455" height="92" rx="8" fill="#fff8ec" stroke="#e7c995" stroke-width="2"/>
+      <text class="boundary-title" x="92" y="1063">本期明确边界</text>
+      ${boundary}
+    `;
+  </script>
+</body>
+</html>

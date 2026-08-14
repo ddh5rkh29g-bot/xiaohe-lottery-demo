@@ -62,18 +62,18 @@
         <div class="section-kicker">02 / USERS, FLOW & SCOPE</div><h2>角分工、完整动线与功能范围</h2>
         <div class="role-strip"><div><strong>运营 / 辅导上级</strong><span>配置课程/大班、奖品和互斥</span></div><div><strong>辅导老师</strong><span>小班管理复制链接、查看中奖记录</span></div><div><strong>学生</strong><span>截止时间前抽奖、领奖、进入报名页</span></div><div><strong>系统</strong><span>小班窗口、互斥、幂等和实时资格</span></div></div>
         <div class="flow-figures">
-          <figure class="flow-figure"><h3>1. 运营配置课外抽奖</h3><div class="flow-image-scroll"><img src="prd-assets/flow-operation-config.png" alt="运营配置课外抽奖流程"></div><figcaption>课中配置保持不变；课外活动独立配置并生成长期复用链接</figcaption></figure>
-          <figure class="flow-figure"><h3>2. 辅导老师复制链接</h3><div class="flow-image-scroll"><img src="prd-assets/flow-tutor-copy-link.png" alt="辅导老师复制课外抽奖链接流程"></div><figcaption>匹配到多个活动时必须由辅导明确选择，不随机发链接</figcaption></figure>
-          <figure class="flow-figure"><h3>3. 学生抽奖与领奖</h3><div class="flow-image-scroll"><img src="prd-assets/flow-student-lottery.png" alt="学生课外抽奖与领奖流程"></div><figcaption>参与资格、互斥限制和中奖学生范围依次判定，点击后即时生成唯一结果</figcaption></figure>
-          <figure class="flow-figure"><h3>4. 辅导老师查看中奖记录</h3><div class="flow-image-scroll"><img src="prd-assets/flow-tutor-records.png" alt="辅导老师查看中奖记录流程"></div><figcaption>同一列表查看课中、课外记录；课外记录的课节保持为空</figcaption></figure>
-          <figure class="flow-figure"><h3>5. 功能全景图</h3><div class="flow-image-scroll"><img src="prd-assets/feature-map.png" alt="课外抽奖功能全景图"></div><figcaption>按课中抽奖、运营后台、学生端、辅导老师和系统支撑分区，同时标明本期不做的能力</figcaption></figure>
+          <figure class="flow-figure"><h3>1. 运营配置课外抽奖</h3><div class="flow-image-scroll"><img src="assets/flow-operation-config.png" alt="运营配置课外抽奖流程"></div><figcaption>课中配置保持不变；课外活动独立配置并生成长期复用链接</figcaption></figure>
+          <figure class="flow-figure"><h3>2. 辅导老师复制链接</h3><div class="flow-image-scroll"><img src="assets/flow-tutor-copy-link.png" alt="辅导老师复制课外抽奖链接流程"></div><figcaption>匹配到多个活动时必须由辅导明确选择，不随机发链接</figcaption></figure>
+          <figure class="flow-figure"><h3>3. 学生抽奖与领奖</h3><div class="flow-image-scroll"><img src="assets/flow-student-lottery.png" alt="学生课外抽奖与领奖流程"></div><figcaption>参与资格、互斥限制和中奖学生范围依次判定，点击后即时生成唯一结果</figcaption></figure>
+          <figure class="flow-figure"><h3>4. 辅导老师查看中奖记录</h3><div class="flow-image-scroll"><img src="assets/flow-tutor-records.png" alt="辅导老师查看中奖记录流程"></div><figcaption>同一列表查看课中、课外记录；课外记录的课节保持为空</figcaption></figure>
+          <figure class="flow-figure"><h3>5. 功能全景图</h3><div class="flow-image-scroll"><img src="assets/feature-map.png" alt="课外抽奖功能全景图"></div><figcaption>按课中抽奖、运营后台、学生端、辅导老师和系统支撑分区，同时标明本期不做的能力</figcaption></figure>
         </div>
       </section>
 
       <section class="section-block" id="backend">
         <div class="section-kicker">03 / BACK OFFICE & DISTRIBUTION</div><h2>后台配置与小班链接</h2>
-        <div class="subsection"><h3>活动列表与课中零改动</h3><p>活动列表只新增“抽奖类型”列，值为“课中抽奖 / 课外抽奖”，其他原字段和操作保持不变。原有课中活动的创建页、编辑页不增加课外字段，也不提供互斥维护入口。</p><figure><img src="prd-assets/backend-activity-list.png" alt="活动列表增加抽奖类型"><figcaption>活动列表截图：视觉参考，字段规则以本版文字为准</figcaption></figure></div>
-        <div class="subsection"><h3>创建或复制课外抽奖</h3><p>活动列表点击复制后，不再出现复制弹窗，直接生成独立草稿 ID 并进入编辑页。仅复制草稿在基础信息上方展示“抽奖类型”，默认来源类型；选择“课外抽奖”后切换为课外配置模块。</p><div class="rule-table"><div><b>复制快照</b><span>活动名称、中奖学生范围、可识别的课程/大班关系、奖品名称/类型/图片/说明</span></div><div><b>重新确认</b><span>全局有效期、适用课程/大班、课外中奖概率、实物发放上限、两个互斥方向</span></div><div><b>绝不共用</b><span>课中固定数量、在线人数比例、虚拟中奖人数、实时库存和后续奖品修改</span></div></div><figure><img src="prd-assets/backend-offclass-edit.png" alt="课外抽奖编辑页"><figcaption>课外编辑页：由运营或辅导上级维护</figcaption></figure></div>
+        <div class="subsection"><h3>活动列表与课中零改动</h3><p>活动列表只新增“抽奖类型”列，值为“课中抽奖 / 课外抽奖”，其他原字段和操作保持不变。原有课中活动的创建页、编辑页不增加课外字段，也不提供互斥维护入口。</p><figure><img src="assets/backend-activity-list.png" alt="活动列表增加抽奖类型"><figcaption>活动列表截图：视觉参考，字段规则以本版文字为准</figcaption></figure></div>
+        <div class="subsection"><h3>创建或复制课外抽奖</h3><p>活动列表点击复制后，不再出现复制弹窗，直接生成独立草稿 ID 并进入编辑页。仅复制草稿在基础信息上方展示“抽奖类型”，默认来源类型；选择“课外抽奖”后切换为课外配置模块。</p><div class="rule-table"><div><b>复制快照</b><span>活动名称、中奖学生范围、可识别的课程/大班关系、奖品名称/类型/图片/说明</span></div><div><b>重新确认</b><span>全局有效期、适用课程/大班、课外中奖概率、实物发放上限、两个互斥方向</span></div><div><b>绝不共用</b><span>课中固定数量、在线人数比例、虚拟中奖人数、实时库存和后续奖品修改</span></div></div><figure><img src="assets/backend-offclass-edit.png" alt="课外抽奖编辑页"><figcaption>课外编辑页：由运营或辅导上级维护</figcaption></figure></div>
         <div class="subsection"><h3>课外基础信息</h3><div class="field-list"><span><b>活动名称</b>必填，沿用原长度限制</span><span><b>全局有效期</b>可按季度配置，作为统一上限</span><span><b>中奖学生范围</b>全部 / 已续报 / 未续报</span><span><b>适用范围</b>课程 / 大班，可多选，按 OR 匹配</span></div></div>
         <div class="subsection"><h3>小班管理复制课外链接</h3><p>辅导老师在艾欧后台“班级管理（小班）”使用“复制课外抽奖链接”。入口只分发，不允许改活动名称、课程/大班、奖品、概率或互斥规则。</p><div class="rule-table"><div><b>0 个活动</b><span>按钮置灰或提示“当前小班暂无可用的课外抽奖”</span></div><div><b>1 个活动</b><span>直接复制并提示“抽奖链接已复制”</span></div><div><b>多个活动</b><span>展示名称、ID、有效期和状态，由辅导明确选择，不能随机</span></div><div><b>匹配链路</b><span>当前小班 → 所属大班和课程 → 任一范围命中</span></div></div><div class="callout callout-blue"><strong>链接规则</strong><span>链接只携带 activity_id。小班 ID 可作为渠道归因参数，但学生资格必须以服务端登录身份和实时班级关系为准。</span></div></div>
       </section>
@@ -82,14 +82,14 @@
         <div class="section-kicker">04 / MUTUAL EXCLUSION & PRIZES</div><h2>互斥规则与独立奖品</h2>
         <div class="callout callout-amber"><strong>配置所有权</strong><span>互斥关系只能从课外活动侧新增、修改和删除；候选只能选课中活动。课中查看页仅展示关联结果。</span></div>
         <div class="direction-pair"><div><small>方向 A</small><strong>课中抽奖中奖后，参与当前课外抽奖</strong><select disabled><option>已中奖不可中奖</option></select></div><div><small>方向 B</small><strong>当前课外抽奖中奖后，参与课中抽奖</strong><select disabled><option>不限制</option></select></div></div>
-        <div class="subsection"><h3>判定规则</h3><ol class="numbered"><li>两个方向分别选择“不限制 / 已中奖不可中奖”，只限制中奖，不限制点击参与。</li><li>一个课外活动可关联多个课中活动；命中任一有效限制即不能在对应方向再次中奖。</li><li>课中开奖时反向查询课外侧维护的规则，不能依赖课中页面是否有编辑入口。</li><li>规则变更只影响之后的新开奖，历史结果不重算、不补发、不追回。</li></ol><figure><img src="prd-assets/backend-class-relation-readonly.png" alt="课中查看页只读展示互斥规则"><figcaption>课中查看页：只读展示由课外活动创建的规则</figcaption></figure></div>
+        <div class="subsection"><h3>判定规则</h3><ol class="numbered"><li>两个方向分别选择“不限制 / 已中奖不可中奖”，只限制中奖，不限制点击参与。</li><li>一个课外活动可关联多个课中活动；命中任一有效限制即不能在对应方向再次中奖。</li><li>课中开奖时反向查询课外侧维护的规则，不能依赖课中页面是否有编辑入口。</li><li>规则变更只影响之后的新开奖，历史结果不重算、不补发、不追回。</li></ol><figure><img src="assets/backend-class-relation-readonly.png" alt="课中查看页只读展示互斥规则"><figcaption>课中查看页：只读展示由课外活动创建的规则</figcaption></figure></div>
         <div class="subsection"><h3>课外奖品与中奖范围</h3><p>课外活动支持实物、优惠券、学贝、皮肤、勋章混合配置。每个奖品配置“中奖概率”；实物可配置“发放数量上限”或选择“不限量”，虚拟权益默认不限量。概率合计不得超过 100%，低于 100% 的剩余部分自动为未中奖，100% 仅表示进入中奖池的有效学生没有未中奖概率。</p><div class="prize-example"><span>实物 <b>10%</b><small>上限10份</small></span><span>优惠券 <b>20%</b><small>不限量</small></span><span>学贝 <b>20%</b><small>不限量</small></span><span>皮肤 <b>20%</b><small>不限量</small></span><span>勋章 <b>20%</b><small>不限量</small></span></div><div class="notice-line">实物达到发放上限后退出奖池，原概率转为未中奖，其他奖品概率不自动重分配；“不限量”表示系统不限制发放数量。课外抽奖的奖品和课中抽奖的奖品独立，请注意库存避免超发。</div></div>
         <div class="subsection winner-pool"><h3>参与资格与中奖资格分开</h3><p>适用课程/大班及小班参与窗口决定“能否进入活动”；中奖学生范围决定“能否进入中奖池”。范围外学生仍能点击，但结果固定为未中奖。</p><div class="pool-table"><div><b>全部学生</b><span>所有有效参与者进入中奖池</span></div><div><b>从已续报中抽取</b><span>仅已续报学生进入中奖池</span></div><div><b>从未续报中抽取</b><span>仅未续报学生进入中奖池</span></div></div><div class="draw-order"><strong>课外开奖顺序</strong><span>活动有效性 → 身份 → 学生/小班/大班/课程 → 小班截止时间 → 首次参与 → 互斥 → 续报范围 → 即时概率</span></div></div>
       </section>
 
       <section class="section-block" id="student">
         <div class="section-kicker">05 / STUDENT EXPERIENCE</div><h2>学生端：小班资格与即时结果</h2>
-        <div class="student-hero"><div><small>抽奖主页面</small><h3>幸运大奖等你来拿</h3><p>顶部展示活动名称；只有抽奖主页面右上角保留“规则”；点击按钮后由服务端立即确定并保存结果。</p></div><img src="prd-assets/student-wheel.png" alt="学生端大转盘"></div>
+        <div class="student-hero"><div><small>抽奖主页面</small><h3>幸运大奖等你来拿</h3><p>顶部展示活动名称；只有抽奖主页面右上角保留“规则”；点击按钮后由服务端立即确定并保存结果。</p></div><img src="assets/student-wheel.png" alt="学生端大转盘"></div>
         <div class="subsection"><h3>小班资格与截止时间</h3><p>系统查询学生当前所在小班，再读取所属大班和课程。任一小班命中活动适用大班或课程，且处于“开课至最后一节课结束后2天”窗口内，即可参与；未到课不影响资格。</p><div class="multi-class-grid"><div><b>结课后顺延48小时</b><span>以小班最后一节课的实际结束时间为起点，计算该学生的参与截止时间。</span></div><div><b>多个小班取较晚值</b><span>只比较当前已进入参与窗口的小班，再受活动全局有效期限制。</span></div><div><b>换班按新班计算</b><span>不保留旧班资格；已产生的抽奖结果不重新开奖。</span></div><div><b>一次结果</b><span>同一 activity_id + student_id 始终只产生一次结果。</span></div></div></div>
         <h3 class="table-title">关键状态矩阵</h3>
         <div class="state-table-wrap"><table class="state-table"><thead><tr><th>场景</th><th>能否开奖</th><th>结果</th><th>页面操作</th></tr></thead><tbody>
@@ -103,7 +103,7 @@
           <tr><td>已参与本次课外抽奖</td><td class="no">否</td><td>返回首次结果</td><td>查看记录；实物待填时填写地址</td></tr>
           <tr><td>已报名正式课</td><td>依抽奖资格</td><td>正常或固定未中奖</td><td>隐藏“跟着老师继续学”</td></tr>
         </tbody></table></div>
-        <div class="result-grid"><figure><img src="prd-assets/student-result.png" alt="学生端中奖结果"><figcaption>实物中奖：进入收货地址流程</figcaption></figure><figure><img src="prd-assets/student-participated-no-win.png" alt="已参与未中奖"><figcaption>已参与：按钮不可再次开奖，返回首次结果</figcaption></figure><figure><img src="prd-assets/student-expired.png" alt="活动失效"><figcaption>活动结束或小班结课超过2天：链接不可参与</figcaption></figure></div>
+        <div class="result-grid"><figure><img src="assets/student-result.png" alt="学生端中奖结果"><figcaption>实物中奖：进入收货地址流程</figcaption></figure><figure><img src="assets/student-participated-no-win.png" alt="已参与未中奖"><figcaption>已参与：按钮不可再次开奖，返回首次结果</figcaption></figure><figure><img src="assets/student-expired.png" alt="活动失效"><figcaption>活动结束或小班结课超过2天：链接不可参与</figcaption></figure></div>
         <div class="subsection multi-class-rule"><h3>正式课入口</h3><p>“跟着老师继续学”仅对未报名正式课、且命中有效售卖链接的学生展示。候选范围为“当前所在小班 ∩ 命中适用课程或大班 ∩ 当前参与窗口有效 ∩ 有效售卖链接”。</p><div class="multi-class-grid"><div><b>无链接或已报名</b><span>隐藏按钮，不影响抽奖与填写地址。</span></div><div><b>一个有效链接</b><span>点击进入对应班级报名 H5。</span></div><div><b>多个有效链接</b><span>按小班开课时间正序选择最早开课班级；同时间按 class_id。</span></div><div><b>换班或查询异常</b><span>换班按新班重算；查询失败则隐藏入口，不使用其他班级兜底。</span></div></div></div>
       </section>
 
@@ -111,12 +111,12 @@
         <div class="section-kicker">05.1 / DELIVERY</div><h2>实物奖：地址与抽奖同步截止</h2>
         <div class="steps"><div><b>01</b><span>按当前小班计算学生截止时间</span></div><div><b>02</b><span>结果弹窗进入收货地址页</span></div><div><b>03</b><span>提交前再次校验当前小班</span></div><div><b>04</b><span>逾期未填则奖品失效且不可补填</span></div></div>
         <div class="callout callout-blue"><strong>截止公式</strong><span>单班截止 = 最后一节课结束时间 + 48h；多班取当前有效窗口的最晚值；最终再与 activity_end_at 取较早值。换班后按新班重新计算。</span></div>
-        <figure class="wide-figure"><img src="prd-assets/student-address-form.png" alt="填写收货地址页面"><figcaption>地址页与中奖记录页不展示“规则”；已填写地址过期后可查看但不可编辑</figcaption></figure>
+        <figure class="wide-figure"><img src="assets/student-address-form.png" alt="填写收货地址页面"><figcaption>地址页与中奖记录页不展示“规则”；已填写地址过期后可查看但不可编辑</figcaption></figure>
       </section>
 
       <section class="section-block" id="records">
         <div class="section-kicker">06 / WINNING RECORDS</div><h2>学生与辅导老师中奖记录</h2>
-        <div class="record-columns"><article><h3>学生中奖记录</h3><p>沿用现有卡片，在卡片角落增加轻量“课中抽奖 / 课外抽奖”标签。实物待填显示“填写收货地址”，已填展示地址摘要。</p><img src="prd-assets/student-winning-records.png" alt="学生中奖记录"></article><article><h3>辅导老师中奖记录</h3><p>新增抽奖类型筛选和列表列。课外没有课节概念，因此课外行的课节单元格保持空白。</p><img src="prd-assets/backend-teacher-winning-records.png" alt="辅导老师中奖记录"></article></div>
+        <div class="record-columns"><article><h3>学生中奖记录</h3><p>沿用现有卡片，在卡片角落增加轻量“课中抽奖 / 课外抽奖”标签。实物待填显示“填写收货地址”，已填展示地址摘要。</p><img src="assets/student-winning-records.png" alt="学生中奖记录"></article><article><h3>辅导老师中奖记录</h3><p>新增抽奖类型筛选和列表列。课外没有课节概念，因此课外行的课节单元格保持空白。</p><img src="assets/backend-teacher-winning-records.png" alt="辅导老师中奖记录"></article></div>
         <div class="filter-spec"><strong>筛选项</strong><span>在读小班</span><span>抽奖类型：全部 / 课中 / 课外</span><span>奖品类型</span><span>课节</span><span>学生</span><strong>辅导权限</strong><span>查看所带班级</span><span>导出当前筛选结果</span><span>小班管理复制链接</span><span>不能修改活动配置</span></div>
       </section>
 

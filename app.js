@@ -34,7 +34,7 @@ const state = {
   ],
   currentId: '4218555718976511', detailMode: 'edit', editType: null,
   activityEligibility: 'valid', classLotteryStatus: 'not_joined', participationStatus: 'not_joined', lotteryOutcome: 'physical_pending', formalCourseStatus: 'not_enrolled', salesLinkStatus: 'single',
-  spun: false, rotation: 0, studentScreen: 'lottery', rulesReturnScreen: 'lottery', usedChanceAction: 'records'
+  spun: false, rotation: 0, lotteryVisualStyle: 'wheel', wheelDemoCount: 'legacy', slotPrizeCount: '8', studentScreen: 'lottery', rulesReturnScreen: 'lottery', usedChanceAction: 'records'
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -57,6 +57,20 @@ const salesLinkCandidates = {
 };
 const selectedSalesLink = () => [...(salesLinkCandidates[state.salesLinkStatus] || [])].sort((a, b) => a.scopeOrder - b.scopeOrder || a.classId.localeCompare(b.classId))[0] || null;
 let relationCandidates = [];
+let slotAnimationTimer = null;
+let slotActiveIndex = 0;
+
+const slotPrizeCatalog = [
+  { name: '投影仪', image: 'assets/prize-projector.png', result: 'physical' },
+  { name: '专注勋章', image: 'assets/prize-robot.png', result: 'virtual' },
+  { name: '谢谢参与', image: 'assets/thanks-placeholder.png', result: 'no_win' },
+  { name: '拍立得', image: 'assets/prize-camera.png', result: 'physical' },
+  { name: '200元课程券', image: 'assets/prize-projector.png', result: 'virtual' },
+  { name: '100学贝', image: 'assets/prize-robot.png', result: 'virtual' },
+  { name: '限定皮肤', image: 'assets/prize-camera.png', result: 'virtual' },
+  { name: '成长礼包', image: 'assets/prize-projector.png', result: 'virtual' },
+  { name: '成长勋章', image: 'assets/prize-robot.png', result: 'virtual' }
+];
 
 function showToast(message) {
   const toast = $('#toast'); toast.textContent = message; toast.classList.add('show');
@@ -264,17 +278,144 @@ function openRelationModal() {
 }
 
 function renderWheel() {
-  const slotCount = Math.max(6, prizes.length);
-  const step = 360 / slotCount;
-  const colors = ['#fff2c9', '#ffc866'];
-  $('#wheel').style.background = `conic-gradient(from ${-step / 2}deg,${Array.from({ length: slotCount }, (_, i) => `${colors[i % colors.length]} ${i * step}deg ${(i + 1) * step}deg`).join(',')})`;
-  $('#wheelLabels').innerHTML = Array.from({ length: slotCount }, (_, i) => {
-    const prize = prizes[i % prizes.length];
-    const angle = (i * step - 90) * Math.PI / 180;
-    return `<div class="wheel-label" style="left:calc(50% + ${Math.cos(angle) * 91}px);top:calc(50% + ${Math.sin(angle) * 91}px)"><img src="${prize.image}" alt=""><span>${prize.name.replace(/.*·/,'')}</span></div>`;
+  const wheel = $('#wheel');
+  if (state.wheelDemoCount === 'legacy') {
+    const visiblePrizes = prizes.slice(0, 8);
+    const slotCount = Math.max(6, visiblePrizes.length);
+    const step = 360 / slotCount;
+    const colors = ['#fff2c9', '#ffc866'];
+    wheel.className = 'wheel wheel-density-legacy';
+    wheel.style.setProperty('--wheel-step', `${step}deg`);
+    wheel.style.background = `conic-gradient(from ${-step / 2}deg,${Array.from({ length: slotCount }, (_, i) => `${colors[i % colors.length]} ${i * step}deg ${(i + 1) * step}deg`).join(',')})`;
+    $('#wheelLabels').innerHTML = Array.from({ length: slotCount }, (_, i) => {
+      const prize = visiblePrizes[i % visiblePrizes.length];
+      const angle = (i * step - 90) * Math.PI / 180;
+      return `<div class="wheel-label legacy-label" style="left:calc(50% + ${Math.cos(angle) * 91}px);top:calc(50% + ${Math.sin(angle) * 91}px)"><img src="${prize.image}" alt=""><span>${prize.name.replace(/.*·/,'')}</span></div>`;
+    }).join('');
+    $('#wheelLights').innerHTML = Array.from({ length: 18 }, (_, i) => `<i style="transform:translate(-50%,-50%) rotate(${i * 20}deg) translateY(-146px)"></i>`).join('');
+    return;
+  }
+  const wheelCount = Number(state.wheelDemoCount) || 3;
+  const fallbackPrizes = [
+    { name: '实物2', type: '实物', image: 'assets/prize-projector.png' },
+    { name: '优惠券', type: '优惠券', image: 'assets/prize-robot.png' },
+    { name: '学贝', type: '学贝', image: 'assets/prize-camera.png' },
+    { name: '皮肤', type: '皮肤', image: 'assets/prize-camera.png' },
+    { name: '勋章', type: '勋章', image: 'assets/prize-robot.png' },
+    { name: '课程券', type: '优惠券', image: 'assets/prize-projector.png' },
+    { name: '惊喜奖', type: '虚拟权益', image: 'assets/prize-camera.png' }
+  ];
+  const realPrizes = Array.from({ length: wheelCount }, (_, index) => prizes[index] || fallbackPrizes[index - prizes.length]);
+  const visualPrizes = [...realPrizes, { name: '谢谢参与', shortName: '谢谢', image: 'assets/thanks-placeholder.png', noWin: true }];
+  if (wheelCount === 1) visualPrizes.splice(1, 0, { name: '幸运奖', shortName: '幸运', image: 'assets/prize-camera.png', placeholder: true });
+  const step = 360 / visualPrizes.length;
+  const colors = ['#ef6250', '#4e9b8e', '#7c6bb0', '#efa17f', '#6d94b5', '#d99b47', '#849b61', '#c76b8e', '#597994'];
+  wheel.className = `wheel wheel-density-${wheelCount}`;
+  wheel.style.setProperty('--wheel-step', `${step}deg`);
+  wheel.style.background = `conic-gradient(from ${-step / 2}deg,${visualPrizes.map((item, i) => `${colors[i % colors.length]} ${i * step}deg ${(i + 1) * step}deg`).join(',')})`;
+  $('#wheelLabels').innerHTML = visualPrizes.map((prize, i) => {
+    const angle = ((i + .5) * step - 90) * Math.PI / 180;
+    const radius = wheelCount >= 8 ? 91 : wheelCount >= 5 ? 94 : 96;
+    const shortName = prize.shortName || prize.name.replace(/.*·/, '').slice(0, wheelCount >= 8 ? 3 : 5);
+    const classes = [prize.noWin ? 'no-win' : '', prize.placeholder ? 'placeholder' : ''].filter(Boolean).join(' ');
+    return `<div class="wheel-label ${classes}" style="left:calc(50% + ${Math.cos(angle) * radius}px);top:calc(50% + ${Math.sin(angle) * radius}px)"><img src="${prize.image}" alt=""><span>${shortName}</span></div>`;
   }).join('');
   $('#wheelLights').innerHTML = Array.from({ length: 18 }, (_, i) => `<i style="transform:translate(-50%,-50%) rotate(${i * 20}deg) translateY(-146px)"></i>`).join('');
 }
+
+function resolvedDrawResult() {
+  return state.classLotteryStatus.startsWith('won_') ? 'no_win' : selectedDrawResult();
+}
+
+function slotLayoutForPrizeCount(prizeCount) {
+  if (prizeCount <= 2) return 3;
+  if (prizeCount <= 5) return 6;
+  return 9;
+}
+
+function buildSlotPrizes() {
+  const realPrizeCount = Math.max(1, Math.min(8, Number(state.slotPrizeCount) || 8));
+  const layoutCount = slotLayoutForPrizeCount(realPrizeCount);
+  const prizeSlots = layoutCount - 1;
+  const luckyCount = prizeSlots - realPrizeCount;
+  const luckyPositions = [2, 4, 6, 8].slice(0, luckyCount);
+  const realPrizes = slotPrizeCatalog.filter(prize => prize.result !== 'no_win').slice(0, realPrizeCount);
+  const slots = [];
+  let realIndex = 0;
+  for (let position = 1; position <= prizeSlots; position += 1) {
+    if (luckyPositions.includes(position)) {
+      slots.push({ name: '幸运奖', image: 'assets/lucky-prize.png', result: 'lucky', placeholder: true });
+    } else {
+      slots.push(realPrizes[realIndex]);
+      realIndex += 1;
+    }
+  }
+  slots.push({ name: '谢谢参与', image: 'assets/thanks-placeholder.png', result: 'no_win', noWin: true });
+  return { layoutCount, realPrizeCount, luckyCount, slots };
+}
+
+function renderSlotMachine() {
+  const { layoutCount, realPrizeCount, luckyCount, slots } = buildSlotPrizes();
+  const grid = $('#slotGrid');
+  if (slotActiveIndex >= slots.length) slotActiveIndex = 0;
+  grid.className = `slot-grid slot-grid-${layoutCount}`;
+  grid.innerHTML = slots.map((prize, index) => `
+    <div class="slot-prize${index === slotActiveIndex ? ' active' : ''}${prize.placeholder ? ' placeholder' : ''}${prize.noWin ? ' no-win' : ''}" data-slot-index="${index}" data-result="${prize.result}">
+      <img src="${prize.image}" alt="${prize.name}">
+      <span>${prize.name}</span>
+    </div>
+  `).join('');
+  const parts = [`当前采用${layoutCount}宫格：${realPrizeCount}个真实奖品`];
+  if (luckyCount) parts.push(`${luckyCount}个幸运奖`);
+  parts.push('1个谢谢参与');
+  $('#slotLayoutHint').textContent = parts.join(' + ');
+}
+
+function renderLotteryVisualStyle() {
+  const slotMode = state.lotteryVisualStyle === 'slot';
+  $('#wheelVisual').classList.toggle('hidden', slotMode);
+  $('#slotVisual').classList.toggle('hidden', !slotMode);
+  $('#wheelCountGroup').classList.toggle('hidden', slotMode);
+  $('#slotCountGroup').classList.toggle('hidden', !slotMode);
+  if (slotMode) renderSlotMachine();
+}
+
+function setSlotHighlight(index, winner = false) {
+  $$('.slot-prize', $('#slotGrid')).forEach((item, itemIndex) => {
+    item.classList.toggle('active', itemIndex === index);
+    item.classList.toggle('winner', winner && itemIndex === index);
+  });
+}
+
+function selectedSlotResultIndex() {
+  const cells = $$('.slot-prize', $('#slotGrid'));
+  const result = resolvedDrawResult();
+  const matchIndex = cells.findIndex(cell => cell.dataset.result === result);
+  return matchIndex >= 0 ? matchIndex : cells.findIndex(cell => cell.dataset.result !== 'lucky' && cell.dataset.result !== 'no_win');
+}
+
+function animateSlotDraw(done) {
+  const cells = $$('.slot-prize', $('#slotGrid'));
+  if (!cells.length) return done();
+  const targetIndex = selectedSlotResultIndex();
+  const totalSteps = cells.length * 3 + ((targetIndex - slotActiveIndex + cells.length) % cells.length || cells.length);
+  let step = 0;
+  const advance = () => {
+    slotActiveIndex = (slotActiveIndex + 1) % cells.length;
+    step += 1;
+    const finished = step >= totalSteps;
+    setSlotHighlight(slotActiveIndex, finished);
+    if (finished) {
+      slotAnimationTimer = setTimeout(done, 450);
+      return;
+    }
+    const progress = step / totalSteps;
+    const delay = 48 + Math.pow(progress, 3) * 235;
+    slotAnimationTimer = setTimeout(advance, delay);
+  };
+  advance();
+}
+
 function renderStudent() {
   $$('.lottery-state').forEach(el => el.classList.remove('active'));
   const eligibilityViews = { expired: '#expiredLotteryState', ineligible: '#ineligibleLotteryState', not_started: '#notStartedLotteryState', auth_required: '#authRequiredLotteryState' };
@@ -293,9 +434,12 @@ function renderStudent() {
   $('#studentLotteryCta').setAttribute('aria-disabled', String(participated));
   $('#spinButton').classList.toggle('used', participated);
   $('#spinButton').setAttribute('aria-disabled', String(participated));
+  $('#slotDrawButton').classList.toggle('used', participated);
+  $('#slotDrawButton').setAttribute('aria-disabled', String(participated));
   renderFloatingRecordEntry();
   showStudentScreen('lottery');
   renderWheel();
+  renderLotteryVisualStyle();
   renderOutcomeControl();
   renderWinningRecord();
 }
@@ -329,10 +473,33 @@ function showUsedChanceModal() {
 function spin() {
   if (state.activityEligibility !== 'valid') return;
   if (state.participationStatus === 'participated' || state.spun) return showUsedChanceModal();
+  if (state.lotteryVisualStyle === 'slot') {
+    const btn = $('#slotDrawButton');
+    btn.disabled = true;
+    animateSlotDraw(() => {
+      btn.disabled = false;
+      state.spun = true;
+      showStudentResult();
+    });
+    return;
+  }
   const btn=$('#spinButton'); btn.disabled=true; state.rotation += 1600; $('#wheel').style.transform=`rotate(${state.rotation}deg)`;
   setTimeout(()=>{ btn.disabled=false; state.spun=true; showStudentResult(); }, 4100);
 }
-function resetStudentResult() { state.spun=false; state.rotation=0; $('#wheel').style.transform='rotate(0deg)'; closeModal('resultModal'); closeModal('usedChanceModal'); renderFloatingRecordEntry(); }
+function resetStudentResult() {
+  clearTimeout(slotAnimationTimer);
+  slotAnimationTimer = null;
+  slotActiveIndex = 0;
+  state.spun=false;
+  state.rotation=0;
+  $('#wheel').style.transform='rotate(0deg)';
+  $('#spinButton').disabled = false;
+  $('#slotDrawButton').disabled = false;
+  $$('.slot-prize', $('#slotGrid')).forEach(item => item.classList.remove('active', 'winner'));
+  closeModal('resultModal');
+  closeModal('usedChanceModal');
+  renderFloatingRecordEntry();
+}
 
 function renderFloatingRecordEntry() {
   const hasOffClassResult = state.participationStatus === 'participated' || state.spun;
@@ -525,7 +692,7 @@ $$('.student-scenario-control').forEach(group => group.addEventListener('click',
   renderScenarioControls();
   renderStudent();
 }));
-$('#spinButton').addEventListener('click', spin); $('#studentLotteryCta').addEventListener('click', spin); $('#resetLotteryBtn').addEventListener('click', () => { resetStudentResult(); showToast('本次结果已重置'); });
+$('#spinButton').addEventListener('click', spin); $('#studentLotteryCta').addEventListener('click', spin); $('#slotDrawButton').addEventListener('click', spin); $('#resetLotteryBtn').addEventListener('click', () => { resetStudentResult(); renderSlotMachine(); showToast('本次结果已重置'); });
 $('#addressBtn').addEventListener('click', openAddressPage);
 $('#recordBtn').addEventListener('click', openWinningRecords);
 $('#courseBtn').addEventListener('click', openCourseSignup);

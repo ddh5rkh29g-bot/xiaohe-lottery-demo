@@ -166,8 +166,11 @@
         <div class="control-group"><span>2. 课中抽奖记录</span><div class="segmented student-scenario-control" data-field="classLotteryStatus"><button class="active" data-value="not_joined">未参与课中抽奖</button><button data-value="lost">课中参与未中奖</button><button data-value="won_physical_pending">课中实物中奖·待填地址</button><button data-value="won_physical_filled">课中实物中奖·已填地址</button><button data-value="won_virtual">课中虚拟奖中奖</button></div></div>
         <div class="control-group"><span>3. 本次课外抽奖状态</span><div class="segmented student-scenario-control" data-field="participationStatus"><button class="active" data-value="not_joined">未参与</button><button data-value="participated">已参与</button></div></div>
         <div class="control-group"><span>4. 开奖结果及领取状态</span><div class="segmented student-scenario-control" data-field="lotteryOutcome" id="lotteryOutcomeControl"><button class="active" data-value="physical_pending">中实物奖</button><button class="hidden" data-value="physical_filled">实物奖·已填地址</button><button data-value="virtual">中虚拟奖</button><button data-value="no_win">未中奖</button></div></div>
-        <div class="control-group"><span>5. 正式课状态</span><div class="segmented student-scenario-control" data-field="formalCourseStatus"><button class="active" data-value="not_enrolled">未报名</button><button data-value="enrolled">已报名·隐藏入口</button><button data-value="unknown">查询异常·隐藏入口</button></div></div>
-        <div class="control-group"><span>6. 售卖链接匹配</span><div class="segmented student-scenario-control" data-field="salesLinkStatus"><button class="active" data-value="single">命中1个班级</button><button data-value="multiple">命中多个·按班级顺序</button><button data-value="none">无有效链接·隐藏入口</button></div><small class="control-note" id="salesLinkSelectionHint">将跳转：数学体验A班报名页</small></div>
+        <div class="control-group"><span>5. 抽奖样式</span><div class="segmented student-scenario-control" data-field="lotteryVisualStyle"><button class="active" data-value="wheel">大转盘</button><button data-value="slot">老虎机 / 跑马灯</button></div></div>
+        <div class="control-group" id="wheelCountGroup"><span>6. 大转盘奖品数量</span><div class="segmented student-scenario-control wheel-count-control" data-field="wheelDemoCount"><button class="active" data-value="legacy">原版样式</button><button data-value="1">1个</button><button data-value="2">2个</button><button data-value="3">3个</button><button data-value="5">5个</button><button data-value="8">8个</button></div><small class="control-note">原版样式为默认；少于2个真实奖品时补“幸运奖”视觉占位；后台最多配置8个奖品</small></div>
+        <div class="control-group hidden" id="slotCountGroup"><span>6. 业务配置奖品数</span><div class="segmented student-scenario-control slot-count-control" data-field="slotPrizeCount"><button data-value="1">1个</button><button data-value="2">2个</button><button data-value="3">3个</button><button data-value="4">4个</button><button data-value="5">5个</button><button data-value="6">6个</button><button data-value="7">7个</button><button class="active" data-value="8">8个</button></div><small class="control-note" id="slotLayoutHint">当前采用9宫格：8个真实奖品 + 1个谢谢参与</small><small class="control-note">幸运奖按第2、第4、第6、第8个奖品位优先补齐；谢谢参与固定排在最后</small></div>
+        <div class="control-group"><span>7. 正式课状态</span><div class="segmented student-scenario-control" data-field="formalCourseStatus"><button class="active" data-value="not_enrolled">未报名</button><button data-value="enrolled">已报名·隐藏入口</button><button data-value="unknown">查询异常·隐藏入口</button></div></div>
+        <div class="control-group"><span>8. 售卖链接匹配</span><div class="segmented student-scenario-control" data-field="salesLinkStatus"><button class="active" data-value="single">命中1个班级</button><button data-value="multiple">命中多个·按班级顺序</button><button data-value="none">无有效链接·隐藏入口</button></div><small class="control-note" id="salesLinkSelectionHint">将跳转：数学体验A班报名页</small></div>
         <button class="btn secondary" id="resetLotteryBtn">重置本次结果</button>
         <div class="simulation-summary"><span id="summaryRuleLabel">即时中奖率</span><strong id="summaryRuleValue">100%</strong><span>地址截止</span><strong>本期活动结束</strong></div>
       </aside>
@@ -178,8 +181,18 @@
           <div id="activeLotteryState" class="lottery-state active">
             <div class="lottery-decorations" aria-hidden="true"><i class="decor-envelope one"></i><i class="decor-envelope two"></i><i class="decor-coin one">¥</i><i class="decor-coin two">¥</i></div>
             <div class="student-copy"><h2>幸运大奖等你来拿</h2></div>
-            <div class="wheel-area"><div class="wheel-rim"><div class="wheel-lights" id="wheelLights" aria-hidden="true"></div><div class="wheel" id="wheel"><div id="wheelLabels"></div></div><div class="wheel-pointer" aria-hidden="true"></div><button class="spin-button" id="spinButton"><span>幸运</span><small>点击抽奖</small></button></div><div class="wheel-shadow"></div></div>
-            <button class="student-lottery-cta" id="studentLotteryCta">立即参与抽奖</button>
+            <div class="lottery-visual" id="wheelVisual">
+              <div class="wheel-area"><div class="wheel-rim"><div class="wheel-lights" id="wheelLights" aria-hidden="true"></div><div class="wheel" id="wheel"><div id="wheelLabels"></div></div><div class="wheel-pointer" aria-hidden="true"></div><button class="spin-button" id="spinButton"><span>幸运</span><small>点击抽奖</small></button></div><div class="wheel-shadow"></div></div>
+              <button class="student-lottery-cta" id="studentLotteryCta">立即参与抽奖</button>
+            </div>
+            <div class="lottery-visual slot-area hidden" id="slotVisual">
+              <div class="slot-machine">
+                <div class="slot-top-sign"><span>LUCKY</span><strong>幸运抽奖</strong><small>好礼等你来</small></div>
+                <div class="slot-screen"><div class="slot-grid slot-grid-9" id="slotGrid" aria-label="奖品跑马灯"></div></div>
+                <button class="slot-draw-button" id="slotDrawButton" type="button"><span>立即参与</span><small>点击开始抽奖</small></button>
+              </div>
+              <div class="slot-machine-shadow" aria-hidden="true"></div>
+            </div>
           </div>
           <div id="expiredLotteryState" class="lottery-state blocked-state"><div class="blocked-icon expired">期</div><h2>活动已结束</h2><p>本期抽奖链接已经失效</p><span class="expired-note">收货地址入口已同步关闭</span></div>
           <div id="ineligibleLotteryState" class="lottery-state blocked-state"><div class="blocked-icon">限</div><h2>暂时无法参与</h2><p>你不在本次抽奖活动的适用课程或班级中</p><span class="expired-note">如有疑问，请联系辅导老师</span></div>
@@ -237,7 +250,7 @@
           </div>
         </section>
 
-        <div class="modal-backdrop student-modal-backdrop" id="resultModal" aria-hidden="true"><div class="student-result" id="studentResult"><button class="result-close" data-close="resultModal">×</button><div class="result-gift" aria-hidden="true"><i></i></div><div class="result-badge" id="resultBadge">中奖啦</div><h2 class="result-heading">我的奖品</h2><div class="result-image"><img id="resultImage" src="assets/prize-projector.png" alt="投影仪"><img id="noWinImage" src="assets/no-win-placeholder.png" alt="未中奖"></div><h3 id="resultTitle">投影仪</h3><p id="resultDescription">请在活动结束前填写收货地址</p><button class="student-primary" id="addressBtn">填写收货地址</button><button class="student-secondary hidden" id="recordBtn">查看中奖记录</button><button class="student-secondary" id="courseBtn">跟着老师继续学</button><small id="resultDeadline">逾期未填写，奖品将自动失效</small></div></div>
+        <div class="modal-backdrop student-modal-backdrop" id="resultModal" aria-hidden="true"><div class="student-result" id="studentResult"><button class="result-close" data-close="resultModal">×</button><div class="result-gift" aria-hidden="true"><i></i></div><div class="result-badge" id="resultBadge">中奖啦</div><h2 class="result-heading">我的奖品</h2><div class="result-image"><img id="resultImage" src="assets/prize-projector.png" alt="投影仪"><img id="noWinImage" src="assets/thanks-placeholder.png" alt="谢谢参与"></div><h3 id="resultTitle">投影仪</h3><p id="resultDescription">请在活动结束前填写收货地址</p><button class="student-primary" id="addressBtn">填写收货地址</button><button class="student-secondary hidden" id="recordBtn">查看中奖记录</button><button class="student-secondary" id="courseBtn">跟着老师继续学</button><small id="resultDeadline">逾期未填写，奖品将自动失效</small></div></div>
 
         <div class="modal-backdrop student-modal-backdrop" id="usedChanceModal" aria-hidden="true"><div class="used-chance-card"><button class="used-chance-close" data-close="usedChanceModal">×</button><div class="chance-wheel" aria-hidden="true"><i></i></div><h2>您的抽奖机会已用完哦~</h2><p>无法再参与本次抽奖活动了哦~</p><button class="used-chance-action" id="usedChanceAction">查看中奖记录</button></div></div>
         <div class="home-indicator"></div>

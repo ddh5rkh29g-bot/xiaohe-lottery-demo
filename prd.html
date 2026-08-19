@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>课外抽奖完整 PRD · v4.1</title>
+  <title>课外抽奖完整 PRD · v4.2</title>
   <link rel="stylesheet" href="prd.css">
 </head>
 <body>
   <header class="doc-topbar">
     <a class="back-link" href="index.html"><span aria-hidden="true">←</span> 返回 Demo</a>
-    <div class="doc-top-meta"><span class="live-dot"></span><span>产品需求文档</span><span class="top-divider"></span><span>v4.1</span></div>
+      <div class="doc-top-meta"><span class="live-dot"></span><span>产品需求文档</span><span class="top-divider"></span><span>v4.2</span></div>
     <div class="top-actions"><button class="top-action" id="printDoc" type="button">打印 / 导出 PDF</button><a class="top-action" href="prd-source.md" target="_blank">查看 Markdown</a></div>
   </header>
 
@@ -25,9 +25,8 @@
         <a href="#student"><span>05</span>学生端</a>
         <a href="#records"><span>06</span>中奖记录</a>
         <a href="#data"><span>07</span>数据与权限</a>
-        <a href="#acceptance"><span>08</span>验收标准</a>
       </nav>
-      <div class="sidebar-note"><span>文档范围</span><strong>课外活动 · 课程/大班资格 · 学生端 · 辅导老师</strong><small>最后更新 2026-08-11</small></div>
+      <div class="sidebar-note"><span>文档范围</span><strong>课外活动 · 课程/大班资格 · 学生端 · 辅导老师</strong><small>最后更新 2026-08-19</small></div>
     </aside>
 
     <main class="doc-main">
@@ -35,7 +34,7 @@
         <div class="eyebrow">LOTTERY PRODUCT REQUIREMENT</div>
         <h1>课外抽奖<br><span>完整产品需求文档</span></h1>
         <p class="hero-lead">课中抽奖受上课时间和到课情况限制，未到课、错过抽奖或课中未中奖的学生缺少课后参与机会。为扩大招生活动覆盖并承接正式课转化，本期新增长期复用的课外抽奖：由运营统一配置，辅导老师复制链接分发，学生在有效期内点击即出结果，并可继续完成领奖或进入正式课报名页面。</p>
-        <div class="hero-meta"><span>版本 <b>v4.1</b></span><span>状态 <b class="status-ready">方案已收口，可进入评审</b></span></div>
+        <div class="hero-meta"><span>版本 <b>v4.2</b></span><span>状态 <b class="status-ready">方案已收口，可进入评审</b></span></div>
       </section>
 
       <section class="section-block" id="decision">
@@ -90,6 +89,7 @@
       <section class="section-block" id="student">
         <div class="section-kicker">05 / STUDENT EXPERIENCE</div><h2>学生端：小班资格与即时结果</h2>
         <div class="student-hero"><div><small>抽奖主页面</small><h3>幸运大奖等你来拿</h3><p>顶部展示活动名称；只有抽奖主页面右上角保留“规则”；点击按钮后由服务端立即确定并保存结果。</p></div><img src="assets/student-wheel.png" alt="学生端大转盘"></div>
+        <div class="subsection"><h3>大转盘奖品展示规则</h3><p>转盘是中奖结果的视觉展示和动效载体，不承担概率计算。服务端先完成资格、互斥、中奖范围、库存和概率判定，前端再播放动画并展示已保存的最终结果。</p><div class="callout callout-blue"><strong>展示上限</strong><span>转盘至少保留 3 个视觉扇区，最多展示 8 个真实奖品；无论奖品概率合计是否为 100%，始终展示“谢谢参与”扇区。</span></div><div class="rule-table"><div><b>0 个真实奖品</b><span>不允许启用活动，需先配置至少 1 个奖品。</span></div><div><b>1 个真实奖品</b><span>展示真实奖品 + “幸运奖”视觉占位 + “谢谢参与”。幸运奖只占位，不参与概率、库存、中奖记录或发奖。</span></div><div><b>2 个真实奖品</b><span>展示真实奖品 1、真实奖品 2 + “谢谢参与”。</span></div><div><b>3 / 5 / 8 个真实奖品</b><span>按奖品配置顺序展示前 3 / 5 / 8 个真实奖品 + “谢谢参与”。</span></div><div><b>超过 8 个真实奖品</b><span>仅展示配置顺序前 8 个真实奖品 + “谢谢参与”；未展示奖品仍参与服务端中奖策略。</span></div></div><h4 class="table-title">展示数量对照</h4><div class="state-table-wrap"><table class="state-table"><thead><tr><th>真实奖品数量</th><th>学生端转盘展示内容</th></tr></thead><tbody><tr><td>0 个</td><td>不允许启用活动</td></tr><tr><td>1 个</td><td>真实奖品 + 幸运奖占位 + 谢谢参与</td></tr><tr><td>2 个</td><td>真实奖品 1～2 + 谢谢参与</td></tr><tr><td>3 个</td><td>真实奖品 1～3 + 谢谢参与</td></tr><tr><td>5 个</td><td>真实奖品 1～5 + 谢谢参与</td></tr><tr><td>8 个</td><td>真实奖品 1～8 + 谢谢参与</td></tr><tr><td>超过 8 个</td><td>前 8 个真实奖品 + 谢谢参与</td></tr></tbody></table></div><div class="notice-line">支持的真实奖品类型：实物、优惠券、学贝、皮肤、勋章。学生端不展示具体中奖概率，转盘扇区数量也不代表实际概率占比。</div><h4 class="table-title">库存耗尽与开奖结果</h4><p>实物库存耗尽后继续保留原扇区，图片、名称和位置不变，不展示“已兑完”等状态；服务端将该奖品从有效奖池中移除，其原配置概率直接转为未中奖，其他奖品概率不自动重分配。</p><div class="rule-table"><div><b>实物1 耗尽前</b><span>实物1 30% · 勋章 30% · 皮肤 20% · 未中奖 20%</span></div><div><b>实物1 耗尽后</b><span>实物1 0% · 勋章 30% · 皮肤 20% · 未中奖 50%</span></div><div><b>概率合计 100%</b><span>“谢谢参与”仅作视觉展示，服务端不会返回未中奖结果，除非有效奖品因库存耗尽等原因转为未中奖。</span></div></div><h4 class="table-title">开奖与结果展示</h4><ol class="numbered"><li>学生点击“立即参与抽奖”，服务端校验资格、互斥、中奖学生范围、库存和概率。</li><li>服务端生成并保存唯一结果，前端播放转盘动画；动画不能使用本地随机数、指针位置、扇区顺序或动画时长生成结果。</li><li>动画结束后展示服务端结果；如果命中的奖品未在前 8 个扇区中，转盘照常播放，结果弹窗展示完整奖品名称、图片和领取方式。</li></ol><div class="field-list"><span><b>display_prizes</b>转盘展示的真实奖品，最多 8 个</span><span><b>display_no_win</b>是否展示谢谢参与，固定为 true</span><span><b>display_placeholder</b>是否展示幸运奖占位</span><span><b>hidden_prize_count</b>未展示奖品数量</span><span><b>result_prize_id</b>实际中奖奖品 ID</span><span><b>result_type</b>中奖 / 未中奖</span></div></div>
         <div class="subsection"><h3>小班资格与截止时间</h3><p>系统查询学生当前所在小班，再读取所属大班和课程。任一小班命中活动适用大班或课程，且处于“开课至最后一节课结束后2天”窗口内，即可参与；未到课不影响资格。</p><div class="multi-class-grid"><div><b>结课后顺延48小时</b><span>以小班最后一节课的实际结束时间为起点，计算该学生的参与截止时间。</span></div><div><b>多个小班取较晚值</b><span>只比较当前已进入参与窗口的小班，再受活动全局有效期限制。</span></div><div><b>换班按新班计算</b><span>不保留旧班资格；已产生的抽奖结果不重新开奖。</span></div><div><b>一次结果</b><span>同一 activity_id + student_id 始终只产生一次结果。</span></div></div></div>
         <h3 class="table-title">关键状态矩阵</h3>
         <div class="state-table-wrap"><table class="state-table"><thead><tr><th>场景</th><th>能否开奖</th><th>结果</th><th>页面操作</th></tr></thead><tbody>
@@ -126,28 +126,7 @@
         <div class="subsection"><h3>已知边界</h3><p>不单独建设换班迁移能力。学生未参与前按当前新班规则实时判断；已经参与过该 activity_id 时，无论换班或重新报班都返回历史结果，不获得第二次开奖机会。</p></div>
       </section>
 
-      <section class="section-block" id="acceptance">
-        <div class="section-kicker">08 / ACCEPTANCE</div><h2>上线前验收清单</h2>
-        <div class="checklist">
-          <label><input type="checkbox"> 原课中抽奖创建、编辑、奖品算法和发起流程无行为变化</label>
-          <label><input type="checkbox"> 课外活动拥有独立 ID、奖品、结果和链接；复制奖品为独立快照</label>
-          <label><input type="checkbox"> 课外活动可关联课程或大班，小班命中任一范围即可匹配活动且不重复</label>
-          <label><input type="checkbox"> 辅导老师可复制链接和查看记录，但不能修改活动规则</label>
-          <label><input type="checkbox"> 互斥只能从课外侧维护，候选仅课中活动，课中查看页只读</label>
-          <label><input type="checkbox"> 两个互斥方向分别在课外开奖和课中开奖前生效，且不禁止点击参与</label>
-          <label><input type="checkbox"> 中奖学生范围只过滤中奖池，范围外学生仍可参与并得到确定结果</label>
-          <label><input type="checkbox"> 同一学生刷新、重复点击、换设备都返回首次结果</label>
-          <label><input type="checkbox"> 学生截止时间能根据小班最后一节课的实际结束时间准确顺延 48 小时</label>
-          <label><input type="checkbox"> 多个当前有效小班取最晚截止时间，再与活动结束时间取较早值</label>
-          <label><input type="checkbox"> 已报名、无售卖链接或查询异常时隐藏正式课入口</label>
-          <label><input type="checkbox"> 多个售卖链接按小班开课时间正序选择最早班级，同时间按 class_id</label>
-          <label><input type="checkbox"> 换班后按新班规则重算资格、截止和售卖链接，已参与结果不重抽</label>
-          <label><input type="checkbox"> 辅导记录支持抽奖类型筛选，课外记录课节为空</label>
-        </div>
-        <div class="pending"><strong>仍需外部确认</strong><span>地址及中奖记录保存期限；虚拟权益失败补发入口；课外比例低于 100% 的未中奖文案；运营编辑角色范围；小班开课时间、最后一节课结束时间及当前在班状态字段。</span></div>
-      </section>
-
-      <footer class="doc-footer"><span>课外抽奖完整 PRD · v4.1</span><span>来源：已确认业务规则 + 可操作 Demo</span><button id="backTop" type="button">回到顶部 ↑</button></footer>
+      <footer class="doc-footer"><span>课外抽奖完整 PRD · v4.2</span><span>来源：已确认业务规则 + 可操作 Demo</span><button id="backTop" type="button">回到顶部 ↑</button></footer>
     </main>
   </div>
 

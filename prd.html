@@ -54,6 +54,7 @@
           <article><b>05</b><h3>课外侧维护互斥</h3><p>候选仅课中活动；课中页面只读，但两个中奖限制方向都可生效。</p></article>
           <article><b>06</b><h3>小班结课后2天截止</h3><p>精确增加48小时；活动全局结束时间仍是统一上限。</p></article>
         </div>
+        <div class="subsection compact-rule-summary"><h3>课中、课外抽奖的小班维度</h3><div class="rule-table"><div><b>课中抽奖</b><span>参与记录按 <code>activity_id + class_id + student_id</code> 唯一；由具体小班发起，同一活动可在不同小班分别执行。课中查询限定当前活动、小班和本次参与学生。</span></div><div><b>课外抽奖</b><span>通用链接只携带 <code>activity_id</code>；参与记录按 <code>activity_id + student_id</code> 唯一。同一学生重复进入时返回首次结果。</span></div><div><b>统一配置</b><span>奖品配置、奖品池和中奖概率仍按活动统一维护，不因增加课中小班维度而重复配置。</span></div></div><div class="multi-class-example"><strong>跨小班示例</strong><br>A班课中未中奖 → A班课外中奖：B班课中仍可按本班课中规则开奖；但B班课外不能再次参与同一课外活动。无论先参加B班课中还是B班课外，A班课外中奖都不会取消B班课中机会。</div></div>
         <div class="callout callout-blue"><strong>一句话定位</strong><span>用最少的课中改动，提供可扩展的独立课外抽奖，并把规则配置权与链接分发权分开。</span></div>
       </section>
 
